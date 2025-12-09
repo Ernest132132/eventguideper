@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Memory Patch</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,600;1,400&display=swap');
+
+        :root {
+            --p3-dark: #080b14;
+            --p3-blue: #1b264f;
+            --p3-light-blue: #63a4ff;
+            --p3-cyan: #d0fffa;
+            --sees-red: #c41e3a;
+            --thread-color: #e0e0e0;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--p3-dark);
+            background: radial-gradient(circle at 50% 30%, #1a2a5e 0%, #050810 80%);
+            font-family: 'Exo 2', sans-serif;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        #game-ui {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        /* Top Right Counter */
+        #level-indicator {
+            position: absolute;
+            top: 30px; right: 40px;
+            text-align: right;
+            border-right: 4px solid var(--p3-light-blue);
+            padding-right: 20px;
+            transition: opacity 0.5s;
+        }
+        #act-label {
+            font-size: 0.8rem; letter-spacing: 3px; color: var(--p3-light-blue);
+        }
+        #level-title {
+            font-size: 2.2rem; font-weight: 800;
+            text-transform: uppercase; font-style: italic;
+            color: white; letter-spacing: 1px;
+            text-shadow: 2px 2px 0px var(--p3-blue);
+        }
+
+        /* Narrative Text Overlay */
+        #narrative-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; 
+        }
+
+        /* Standard Game Text */
+        #narrative {
+            width: 60%; max-width: 700px;
+            text-align: center;
+            font-style: italic;
+            font-size: 1.4rem;
+            line-height: 1.5;
+            color: var(--p3-cyan);
+            text-shadow: 0 0 15px rgba(99, 164, 255, 0.4);
+            background: rgba(8, 11, 20, 0.8);
+            padding: 25px;
+            border-left: 3px solid var(--p3-light-blue);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+
+        /* Full Screen Text Mode */
+        #story-mode-text {
+            display: none;
+            font-size: 1.8rem;
+            max-width: 800px;
+            text-align: center;
+            color: white;
+            line-height: 1.6;
+            text-shadow: 0 0 20px var(--p3-light-blue);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .story-hint {
+            font-size: 0.9rem;
+            color: var(--p3-light-blue);
+            margin-top: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+
+        /* Bottom Instruction */
+        #instructions {
+            position: absolute; bottom: 40px; width: 100%;
+            text-align: center;
+            font-size: 1rem; letter-spacing: 2px;
+            text-transform: uppercase; font-weight: bold;
+            color: rgba(255, 255, 255, 0.6);
+            transition: opacity 0.5s;
+        }
+
+        canvas {
+            position: absolute; top: 0; left: 0;
+            z-index: 1; touch-action: none; cursor: none;
+            transition: opacity 1s;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+
+        /* End Screen */
+        #end-screen {
+            display: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 8, 16, 0.98);
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 2s ease;
+            pointer-events: auto;
+            cursor: default;
+        }
+        #end-screen h1 {
+            font-size: 4rem; margin: 0;
+            transform: skew(-10deg); color: white;
+            border-bottom: 5px solid var(--sees-red);
+            padding-bottom: 10px;
+        }
+        #end-screen p {
+            font-size: 1.4rem; color: var(--p3-cyan);
+            margin-top: 30px; max-width: 600px;
+            text-align: center; line-height: 1.6;
+        }
+        button {
+            margin-top: 50px; background: transparent; border: 2px solid var(--p3-cyan);
+            color: var(--p3-cyan); padding: 15px 50px;
+            font-size: 1rem; letter-spacing: 2px; font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase; font-weight: bold; cursor: pointer; transition: all 0.3s;
+        }
+        button:hover {
+            background: var(--p3-cyan); color: var(--p3-dark);
+            box-shadow: 0 0 25px var(--p3-light-blue);
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="game-ui">
+    <div id="level-indicator">
+        <div id="act-label">ACT I</div>
+        <div id="level-title">Scrap Fabric</div>
+    </div>
+    
+    <div id="narrative-container">
+        <div id="narrative">Initializing...</div>
+        
+        <div id="story-mode-text">
+            <span id="story-content">...</span>
+            <div class="story-hint">[ Click to Advance ]</div>
+        </div>
+    </div>
+    
+    <div id="instructions">Drag across the tear to stitch</div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<div id="end-screen">
+    <h1>INTEGRITY RESTORED</h1>
+    <p>"I cannot replace them. But I can be the thread that keeps the memory warm."</p>
+    <button onclick="location.reload()">Re-Initialize System</button>
+</div>
+
+<script>
+    // --- Data: Levels & Story Segments ---
+    
+    const LEVELS = [
+        {
+            type: 'GAME',
+            id: 'scrap',
+            act: 'ACT I',
+            title: 'Scrap Cloth',
+            colorObj: '#4a4a4a', 
+            colorThread: '#ffffff',
+            tearType: 'vertical',
+            requiredStitches: 10,
+            needsAlign: false,
+            narrative: [
+                "Internal Directive: Discard. Replace.",
+                "The armband is ruined. Faded fabric. Cracked lettering.",
+                "There are pristine replacements in inventory.",
+                "But my arm stops mid-motion. A memory file triggers."
+            ]
+        },
+        {
+            type: 'STORY',
+            content: "Memory File 004: <br>It was a summer night on the dorm roof. <br>Akihiko wiped his forehead with his sleeve, grinning despite the exhaustion. <br><br>\"Man, this thing's getting tight. Guess I'm bulking up.\""
+        },
+        {
+            type: 'GAME',
+            id: 'uniform',
+            act: 'ACT II',
+            title: 'Gekkoukan Blazer',
+            colorObj: '#111111', 
+            colorThread: '#666666',
+            tearType: 'diagonal',
+            requiredStitches: 15,
+            needsAlign: false,
+            narrative: [
+                "If I replace it, that specific moment is erased.",
+                "The new one would be perfect. But it would be empty.",
+                "Query: Can integrity be restored without erasure?",
+                "I search the drawers. A cheap plastic sewing kit."
+            ]
+        },
+        {
+            type: 'STORY',
+            content: "Analysis: <br>My friends are biological. <br>They fray. They fade. They will eventually stop.<br><br>I calculate the optimal stitch pattern in a nanosecond, but..."
+        },
+        {
+            type: 'GAME',
+            id: 'collar',
+            act: 'ACT III',
+            title: 'Orange Collar',
+            colorObj: '#d8682b', 
+            colorThread: '#f0f0f0', 
+            tearType: 'horizontal',
+            requiredStitches: 20,
+            needsAlign: false,
+            narrative: [
+                "I must simulate a human touch.",
+                "I have to be… gentle.",
+                "I push the needle through. In. Out.",
+                "The thread catches. A knot forms."
+            ]
+        },
+        {
+            type: 'GAME',
+            id: 'holster',
+            act: 'ACT IV',
+            title: 'Evoker Strap',
+            colorObj: '#1a1a1a', 
+            colorThread: '#cccccc',
+            tearType: 'horizontal-gap', // NEW VISUAL TYPE
+            requiredStitches: 25,
+            needsAlign: false,
+            narrative: [
+                "The heavy canvas strap of the holster.",
+                "Worn thin by the friction of drawing the weapon.",
+                "This strap bore the weight of their resolve.",
+                "It cannot be discarded."
+            ]
+        },
+        {
+            type: 'STORY',
+            content: "The knot is ugly. But it is strong. <br>It holds the fabric together more securely than a straight stitch would have.<br><br>A deviation. An error. A scar."
+        },
+        {
+            type: 'GAME',
+            id: 'armband',
+            act: 'ACT V',
+            title: 'S.E.E.S. Armband',
+            colorObj: '#c41e3a',
+            colorThread: '#ff9999',
+            tearType: 'complex',
+            requiredStitches: 35,
+            needsAlign: true,
+            narrative: [
+                "I weave the new, brighter thread into the faded crimson.",
+                "The repair is proof that someone cared enough to save it.",
+                "I cannot stop them from breaking.",
+                "But I can be the thread."
+            ]
+        }
+    ];
+
+    // --- Engine Variables ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // UI Elements
+    const uiLvlInd = document.getElementById('level-indicator');
+    const uiAct = document.getElementById('act-label');
+    const uiTitle = document.getElementById('level-title');
+    const uiNarrativeBox = document.getElementById('narrative');
+    const uiStoryBox = document.getElementById('story-mode-text');
+    const uiStoryContent = document.getElementById('story-content');
+    const uiInstruct = document.getElementById('instructions');
+    const endScreen = document.getElementById('end-screen');
+
+    let width, height;
+    let currentLevelIdx = 0;
+    let gameState = 'GAME'; // GAME, ALIGN, STORY, TRANSITION, END
+    
+    let stitches = [];
+    let stitchCount = 0;
+    
+    // Mouse/Touch
+    let mouse = { x: 0, y: 0, down: false, prevX: 0, prevY: 0 };
+    let threadTrail = [];
+
+    // Geometry
+    let tearPath = []; 
+    let objLeft = { x:0, y:0, w:0, h:0 }; 
+    let objRight = { x:0, y:0, w:0, h:0, isDragging: false }; 
+
+    // --- Init ---
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        // Re-init current level to fix positions
+        if(gameState !== 'END') initLevel(currentLevelIdx);
+    }
+    window.addEventListener('resize', resize);
+
+    function initLevel(idx) {
+        if (idx >= LEVELS.length) {
+            triggerEndGame();
+            return;
+        }
+
+        const lvl = LEVELS[idx];
+        stitches = [];
+        stitchCount = 0;
+        
+        if (lvl.type === 'STORY') {
+            setupStoryMode(lvl);
+        } else {
+            setupGameMode(lvl);
+        }
+    }
+
+    function setupStoryMode(lvl) {
+        gameState = 'STORY';
+        
+        // Hide Game UI
+        canvas.style.opacity = 0;
+        uiLvlInd.style.opacity = 0;
+        uiInstruct.style.opacity = 0;
+        uiNarrativeBox.style.display = 'none';
+        
+        // Show Story UI
+        uiStoryBox.style.display = 'block';
+        setTimeout(() => {
+            uiStoryContent.innerHTML = lvl.content;
+            uiStoryBox.style.opacity = 1;
+        }, 100);
+    }
+
+    function setupGameMode(lvl) {
+        // Reset UI visibility
+        canvas.style.opacity = 1;
+        uiLvlInd.style.opacity = 1;
+        uiInstruct.style.opacity = 1;
+        uiNarrativeBox.style.display = 'block';
+        uiStoryBox.style.display = 'none';
+        uiStoryBox.style.opacity = 0;
+
+        uiAct.innerText = lvl.act;
+        uiTitle.innerText = lvl.title;
+        updateNarrative(lvl.narrative[0]);
+        
+        const cx = width / 2;
+        const cy = height / 2;
+        tearPath = [];
+        
+        if (lvl.needsAlign) {
+            gameState = 'ALIGN';
+            uiInstruct.innerText = "DRAG THE PIECE TO ALIGN";
+            objLeft = { x: cx - 250, y: cy - 100, w: 200, h: 200 };
+            objRight = { x: cx + 250, y: cy - 100, w: 200, h: 200 };
+        } else {
+            gameState = 'GAME';
+            uiInstruct.innerText = "WEAVE BACK AND FORTH TO REPAIR";
+            
+            // Define Hitbox logic
+            if (lvl.tearType === 'vertical') {
+                tearPath = [{x: cx, y: cy - 150}, {x: cx, y: cy + 150}];
+            } else if (lvl.tearType === 'horizontal' || lvl.tearType === 'horizontal-gap') {
+                tearPath = [{x: cx - 150, y: cy}, {x: cx + 150, y: cy}];
+            } else if (lvl.tearType === 'diagonal') {
+                tearPath = [{x: cx - 80, y: cy - 150}, {x: cx + 80, y: cy + 150}];
+            } else if (lvl.tearType === 'complex') {
+                 tearPath = [{x: cx, y: cy - 100}, {x: cx, y: cy + 100}];
+        }
+    }
+    }
+
+    // --- Input Handling ---
+    
+    // Global click handler for Story Mode
+    window.addEventListener('click', () => {
+        if (gameState === 'STORY') {
+            // Fade out story
+            uiStoryBox.style.opacity = 0;
+            setTimeout(() => {
+                currentLevelIdx++;
+                initLevel(currentLevelIdx);
+            }, 500);
+        }
+    });
+
+    ['mousedown', 'touchstart'].forEach(evt => 
+        window.addEventListener(evt, e => {
+            if (gameState === 'STORY') return; // Handled by click above
+            
+            mouse.down = true;
+            updateMouse(e);
+            
+            if (gameState === 'ALIGN') {
+                if (mouse.x > objRight.x && mouse.x < objRight.x + objRight.w &&
+                    mouse.y > objRight.y && mouse.y < objRight.y + objRight.h) {
+                    objRight.isDragging = true;
+                }
+            }
+        })
+    );
+
+    ['mousemove', 'touchmove'].forEach(evt => 
+        window.addEventListener(evt, e => {
+            if (gameState === 'STORY') return;
+            
+            updateMouse(e);
+            
+            if (gameState === 'ALIGN' && objRight.isDragging) {
+                objRight.x = mouse.x - objRight.w/2;
+                const targetX = objLeft.x + objLeft.w; 
+                if (Math.abs(objRight.x - targetX) < 30) {
+                    objRight.x = targetX;
+                    objRight.isDragging = false;
+                    completeAlign();
+                }
+            }
+            
+            if (gameState === 'GAME' && mouse.down) {
+                handleSewing();
+            }
+        })
+    );
+
+    ['mouseup', 'touchend'].forEach(evt => 
+        window.addEventListener(evt, e => {
+            mouse.down = false;
+            objRight.isDragging = false;
+            threadTrail = [];
+        })
+    );
+
+    function updateMouse(e) {
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        mouse.prevX = mouse.x;
+        mouse.prevY = mouse.y;
+        mouse.x = clientX;
+        mouse.y = clientY;
+    }
+
+    function completeAlign() {
+        gameState = 'GAME';
+        uiInstruct.innerText = "WEAVE THE THREAD";
+        const cx = width / 2;
+        const cy = height / 2;
+        tearPath = [{x: cx, y: cy - 100}, {x: cx, y: cy + 100}];
+        
+        // Flash
+        let flash = document.createElement('div');
+        flash.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%;background:white;opacity:0.6;pointer-events:none;transition:opacity 0.5s;";
+        document.body.appendChild(flash);
+        setTimeout(() => flash.style.opacity = '0', 50);
+        setTimeout(() => flash.remove(), 550);
+    }
+
+    // --- Game Logic ---
+    function handleSewing() {
+        threadTrail.push({x: mouse.x, y: mouse.y});
+        if (threadTrail.length > 20) threadTrail.shift();
+        if (tearPath.length < 2) return;
+        
+        const p1 = tearPath[0];
+        const p2 = tearPath[1];
+        if (intersects(mouse.prevX, mouse.prevY, mouse.x, mouse.y, p1.x, p1.y, p2.x, p2.y)) {
+            addStitch(mouse.x, mouse.y);
+        }
+    }
+
+    function intersects(a,b,c,d,p,q,r,s) {
+        var det, gamma, lambda;
+        det = (c - a) * (s - q) - (r - p) * (d - b);
+        if (det === 0) return false;
+        lambda = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
+        gamma = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
+        return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
+    }
+
+    function addStitch(x, y) {
+        if (stitches.length > 0) {
+            const last = stitches[stitches.length - 1];
+            if (Math.hypot(last.bx - x, last.by - y) < 8) return; 
+        }
+
+        const side = (x < width/2) ? -1 : 1;
+        const startX = x - (side * (15 + Math.random() * 15));
+        const startY = y + (Math.random() * 10 - 5);
+
+        stitches.push({
+            ax: startX, ay: startY,
+            bx: x, by: y,
+            alpha: 0
+        });
+
+        stitchCount++;
+        checkProgress();
+    }
+
+    function checkProgress() {
+        const lvl = LEVELS[currentLevelIdx];
+        const storyStep = Math.ceil(lvl.requiredStitches / lvl.narrative.length);
+        const storyIdx = Math.floor(stitchCount / storyStep);
+        
+        if (storyIdx < lvl.narrative.length) {
+            updateNarrative(lvl.narrative[storyIdx]);
+        }
+        if (stitchCount >= lvl.requiredStitches) {
+            levelComplete();
+        }
+    }
+
+    function updateNarrative(text) {
+        if (uiNarrativeBox.innerText === text) return;
+        uiNarrativeBox.style.opacity = 0;
+        uiNarrativeBox.style.transform = "translateY(10px)";
+        setTimeout(() => {
+            uiNarrativeBox.innerText = text;
+            uiNarrativeBox.style.opacity = 1;
+            uiNarrativeBox.style.transform = "translateY(0)";
+        }, 300);
+    }
+
+    function levelComplete() {
+        gameState = 'TRANSITION';
+        uiInstruct.innerText = "COMPLETE";
+        setTimeout(() => {
+            currentLevelIdx++;
+            initLevel(currentLevelIdx);
+        }, 1500);
+    }
+
+    function triggerEndGame() {
+        gameState = 'END';
+        endScreen.style.display = 'flex';
+        setTimeout(() => endScreen.style.opacity = 1, 100);
+    }
+
+    // --- Rendering ---
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        if (gameState === 'END' || gameState === 'STORY') {
+            requestAnimationFrame(draw);
+            return;
+        }
+
+        const lvl = LEVELS[currentLevelIdx];
+        if (!lvl) return;
+
+        drawObject(lvl);
+        drawTear(lvl);
+        drawStitches(lvl);
+        
+        if (gameState === 'GAME' || gameState === 'ALIGN') {
+            drawCursor(lvl);
+        }
+        requestAnimationFrame(draw);
+    }
+
+    function drawObject(lvl) {
+        const cx = width/2;
+        const cy = height/2;
+        ctx.fillStyle = lvl.colorObj;
+
+        if (lvl.id === 'scrap') {
+            ctx.fillRect(cx - 150, cy - 200, 300, 400);
+            ctx.strokeStyle = "rgba(255,255,255,0.05)";
+            ctx.beginPath();
+            for(let i=0; i<400; i+=20) { ctx.moveTo(cx-150, cy-200+i); ctx.lineTo(cx+150, cy-200+i); }
+            ctx.stroke();
+        } 
+        else if (lvl.id === 'uniform') {
+            ctx.beginPath();
+            ctx.moveTo(cx - 100, cy - 250);
+            ctx.lineTo(cx + 120, cy - 250); 
+            ctx.lineTo(cx + 160, cy + 250); 
+            ctx.lineTo(cx - 80, cy + 250);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = "#d4af37";
+            ctx.beginPath(); ctx.arc(cx + 100, cy + 180, 15, 0, Math.PI*2); ctx.fill();
+        }
+        else if (lvl.id === 'collar') {
+            ctx.fillRect(cx - 300, cy - 60, 600, 120);
+            ctx.fillStyle = "#c0c0c0";
+            for(let i=-200; i<=200; i+=100) {
+                if (i===0) continue; 
+                ctx.beginPath(); ctx.arc(cx + i, cy, 8, 0, Math.PI*2); ctx.fill();
+            }
+        }
+        else if (lvl.id === 'holster') {
+            // Updated Visuals for Strap Gap
+            const strapW = 220;
+            const strapH = 600;
+            const gapSize = 20;
+
+            // Top Piece (Ending at gap)
+            ctx.fillStyle = lvl.colorObj;
+            ctx.fillRect(cx - strapW/2, cy - 300, strapW, 300 - gapSize/2);
+            
+            // Bottom Piece (Starting after gap)
+            ctx.fillRect(cx - strapW/2, cy + gapSize/2, strapW, 300 - gapSize/2);
+
+            // Stitching holes/texture on edge
+            ctx.fillStyle = "rgba(255,255,255,0.1)";
+            ctx.fillRect(cx - strapW/2 + 10, cy - 300, 5, 300 - gapSize/2);
+            ctx.fillRect(cx + strapW/2 - 15, cy - 300, 5, 300 - gapSize/2);
+            ctx.fillRect(cx - strapW/2 + 10, cy + gapSize/2, 5, 300 - gapSize/2);
+            ctx.fillRect(cx + strapW/2 - 15, cy + gapSize/2, 5, 300 - gapSize/2);
+        }
+        else if (lvl.id === 'armband') {
+            ctx.fillStyle = lvl.colorObj;
+            ctx.fillRect(objLeft.x, objLeft.y, objLeft.w, objLeft.h);
+            ctx.fillStyle = "rgba(255,255,255,0.9)";
+            ctx.font = "bold 60px 'Exo 2'";
+            ctx.fillText("S.E.", objLeft.x + 40, objLeft.y + 120);
+
+            ctx.fillStyle = lvl.colorObj;
+            ctx.fillRect(objRight.x, objRight.y, objRight.w, objRight.h);
+            ctx.fillStyle = "rgba(255,255,255,0.9)";
+            ctx.fillText("E.S.", objRight.x + 20, objRight.y + 120);
+        }
+    }
+
+    function drawTear(lvl) {
+        if (gameState === 'ALIGN') return;
+        
+        // Don't draw tear line for the GAP type (visuals handle it)
+        if (lvl.tearType === 'horizontal-gap') return; 
+
+        ctx.strokeStyle = "rgba(0,0,0,0.4)";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        if (tearPath.length >= 2) {
+            ctx.moveTo(tearPath[0].x, tearPath[0].y);
+            ctx.lineTo(tearPath[1].x, tearPath[1].y);
+        }
+        ctx.stroke();
+    }
+
+    function drawStitches(lvl) {
+        ctx.strokeStyle = lvl.colorThread;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        stitches.forEach(s => {
+            if (s.alpha < 1) s.alpha += 0.05;
+            ctx.globalAlpha = s.alpha;
+            ctx.moveTo(s.ax, s.ay);
+            ctx.lineTo(s.bx, s.by);
+        });
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+    }
+
+    function drawCursor(lvl) {
+        if (threadTrail.length > 0) {
+            ctx.beginPath();
+            ctx.strokeStyle = lvl.colorThread;
+            ctx.lineWidth = 2;
+            ctx.moveTo(threadTrail[0].x, threadTrail[0].y);
+            for(let p of threadTrail) ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+        }
+        ctx.save();
+        ctx.translate(mouse.x, mouse.y);
+        ctx.rotate(-Math.PI / 4);
+        ctx.shadowColor = 'rgba(255,255,255,0.8)';
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = '#e0e0e0';
+        ctx.fillRect(0, -1.5, 45, 3);
+        ctx.fillStyle = '#111';
+        ctx.beginPath(); ctx.arc(40, 0, 1.5, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+    }
+
+    resize();
+    draw();
+
+</script>
+</body>
+</html>

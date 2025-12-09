@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>BUFFERING AT THE FOOD COURT: v3</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        body {
+            margin: 0; overflow: hidden;
+            background-color: #111;
+            font-family: 'VT323', monospace;
+            touch-action: none; /* Disables scroll/zoom for gameplay */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #canvas-container { position: fixed; top: 0; left: 0; z-index: 1; }
+
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            z-index: 10; pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        #ui-layer {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 600px; z-index: 20;
+            display: flex; flex-direction: column;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.8));
+            transition: opacity 0.2s;
+        }
+
+        .speaker-box {
+            background: #FFE600; color: #111;
+            padding: 5px 20px; font-size: 1.8rem; font-weight: bold;
+            width: fit-content; border: 3px solid #fff;
+            transform: skew(-15deg) translateX(10px);
+            margin-bottom: -5px; z-index: 22; display: none;
+        }
+
+        .text-box {
+            background: rgba(0, 0, 0, 0.9); border: 3px solid #FFE600;
+            padding: 20px; color: #fff; font-size: 1.5rem; line-height: 1.3;
+            min-height: 120px; clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
+        }
+
+        .tap-indicator {
+            position: absolute; bottom: 15px; right: 20px; color: #FFE600;
+            animation: blink 0.8s infinite;
+        }
+        @keyframes blink { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+
+        /* MINI GAME UI */
+        #minigame-ui {
+            position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+            width: 90%; text-align: center; z-index: 30; display: none;
+            pointer-events: none;
+        }
+        .game-instruction {
+            font-size: 4rem; color: #FFE600; text-shadow: 4px 4px #000;
+            font-weight: bold; line-height: 0.9;
+            animation: pop 0.5s infinite alternate;
+        }
+        @keyframes pop { from { transform: scale(1) rotate(-2deg); } to { transform: scale(1.1) rotate(2deg); } }
+
+        #tuning-container { pointer-events: auto; }
+        input[type=range] {
+            width: 80%; height: 40px; margin-top: 20px;
+            accent-color: #FFE600; cursor: pointer;
+        }
+        
+        #version-tag {
+            position: fixed; top: 10px; right: 10px; color: rgba(255,255,255,0.3); z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="version-tag">v3.0</div>
+    <div class="scanlines"></div>
+    <div id="canvas-container"></div>
+
+    <div id="minigame-ui">
+        <div id="game-title" class="game-instruction">GAME START!</div>
+        <div id="tuning-container" style="display:none; margin-top:20px;">
+            <p style="color:white; font-size:1.5rem; background:black; display:inline-block; padding:5px;">DRAG SLIDER</p><br>
+            <input type="range" id="tuner" min="0" max="100" value="0">
+        </div>
+    </div>
+
+    <div id="ui-layer" onclick="handleInput()">
+        <div id="speaker" class="speaker-box">SPEAKER</div>
+        <div id="dialogue" class="text-box">
+            <span id="typing-text">System initializing...<br>[TAP TO CONNECT]</span>
+            <div class="tap-indicator" id="arrow">▼</div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. GAME CONFIG ---
+        let gameState = "STORY"; 
+        let inputLocked = false;
+        
+        const story = [
+            { type: 'narration', text: "The Junes Food Court. The sky was stuck on 'Sunny Afternoon,' scrolling and snapping back every 12 seconds." },
+            { type: 'narration', text: "The tables were shiny, and Kanji's steak skewers had been steaming for three hours.", effect: 'kanjiSteam' },
+            { type: 'dialogue', speaker: "Kanji", text: "This is bull. I can see 'em. Why can't I grab 'em?!", anim: 'shakeKanji' },
+            { type: 'dialogue', speaker: "Naoto", text: "It's a rendering issue. Physics engine is offline.", anim: 'glitchNaoto' },
+            { type: 'dialogue', speaker: "Kanji", text: "Watch me! I just gotta be fast enough!", anim: 'shakeKanji' },
+            
+            // --- GAME 1: SKEWERS ---
+            { type: 'minigame_skewer', text: "MINIGAME: GRAB THE MEAT!" }, 
+
+            { type: 'dialogue', speaker: "Kanji", text: "See?! They just teleport! I hate this place.", anim: 'shakeKanji' },
+            { type: 'dialogue', speaker: "Naoto", text: "We're backup files, Kanji. We are currently 'Cut Content'." },
+            { type: 'action', text: "*CRASH*", effect: 'teddieRoll' },
+            { type: 'dialogue', speaker: "Teddie", text: "I'm not cut content! I'm the star! Look at me roll!", anim: 'spinTeddie' },
+            { type: 'dialogue', speaker: "Rise", text: "Guys! Quiet! I'm picking up a signal... but the Fog is too thick!", anim: 'bounceRise' },
+            
+            // --- GAME 2: FOG SCRUB ---
+            { type: 'minigame_fog', text: "MINIGAME: SCRUB THE FOG!" },
+
+            { type: 'dialogue', speaker: "Rise", text: "Clear! But the frequency is drifting... Help me tune it!", anim: 'bounceRise' },
+
+            // --- GAME 3: TUNER ---
+            { type: 'minigame_tuning', text: "MINIGAME: TUNE THE SIGNAL" },
+
+            { type: 'dialogue', speaker: "Rise", text: "Got it! It's Yosuke! He just... tripped over a keychain display.", anim: 'bounceRise' },
+            { type: 'dialogue', speaker: "Kanji", text: "BWAHAHA! Even in 4K resolution, he's a klutz.", anim: 'shakeKanji' },
+            { type: 'dialogue', speaker: "Naoto", text: "The narrative framework is holding. Senpai is doing well.", anim: 'nodNaoto' },
+            { type: 'narration', text: "The clouds reset. The static cleared. They weren't forgotten." },
+            { type: 'narration', text: "CONNECTION TERMINATED.", effect: 'end' }
+        ];
+
+        // --- 2. ENGINE & ASSETS ---
+        let city = [], clouds = [], skewers = [], fogParticles = [], confetti = [];
+        let kanjiSteam = [];
+        let timer = 0, score = 0, tuningTarget = 75;
+
+        // SPRITE MAPS (8-BIT)
+        const spriteScale = 4;
+        const sprites = {
+            kanji: [
+                "  HHHH  ", " HHHHHH ", "HSSSSSSH", " SBBSSB ", " SSSSSS ",
+                "CCCCCCCC", "C CACC C", "C CACC C", "CCCCCCCC", " L L  L L", " L L  L L"
+            ],
+            naoto: [
+                "  CCCC  ", " CCCCCC ", "HSSSSSSH", " S B S B", " SSSSSS ",
+                "JJJJJJJJ", "J YJJY J", "JJJJJJJJ", "J J  J J", "L L  L L"
+            ],
+            rise: [
+                "H      H", "HH    HH", " HHHHHH ", " HSSSSH ", " S B S B",
+                " SSSSSS ", " WWWWWW ", " WRRWRR ", " WWWWWW ", " SSSSSS "
+            ],
+            teddie: [
+                "   BB   ", " BBBBBB ", "BBWWWWBB", "B WBBW B", "BWWWWWWB",
+                " BBBBBB ", " RRRRRR ", " RRRRRR ", " B B  B B", " B B  B B"
+            ]
+        };
+        const colors = {
+            'H': '#F0E68C', 'S': '#FFDAB9', 'B': '#000000', 'C': '#000080',
+            'A': '#FFFFFF', 'L': '#333333', 'J': '#0000CD', 'Y': '#FFD700',
+            'W': '#FFFFFF', 'R': '#DC143C'
+        };
+
+        // Character States
+        let charAnim = { kanjiShake: 0, riseBounce: 0, teddieRollX: -100, naotoGlitch: 0 };
+        // Initial Positions
+        let cPos = { k:0.2, n:0.45, r:0.7, t:0.85 };
+
+        function setup() {
+            let cnv = createCanvas(windowWidth, windowHeight);
+            cnv.parent('canvas-container');
+            noSmooth(); rectMode(CORNER);
+            for(let i=0; i<20; i++) city.push(new Building(i * (width/15)));
+            for(let i=0; i<5; i++) clouds.push(new Cloud());
+        }
+
+        function draw() {
+            background(255, 235, 59);
+            
+            // Environment
+            push(); translate(0, height/2 - 50);
+            for(let b of city) { b.update(); b.show(); }
+            pop();
+            setGradient(0, height/2 - 50, width, height/2 + 50, color(255,235,59, 100), color(255,235,59, 255));
+            drawFloor();
+
+            if (gameState !== 'END') drawCharacters();
+
+            // Games
+            if(gameState === "SKEWER_GAME") playSkewerGame();
+            else if(gameState === "FOG_GAME") playFogGame();
+            else if(gameState === "TUNING_GAME") playTuningGame();
+
+            // Props
+            for(let c of clouds) { c.update(); c.show(); }
+            for(let c of confetti) { c.update(); c.show(); }
+            
+            // Steam
+            if(gameState === 'STORY' && charAnim.kanjiShake > 0) {
+                if(frameCount % 5 === 0) kanjiSteam.push(new Steam(width*cPos.k + 20, height/2 + 50));
+            }
+            for(let i=kanjiSteam.length-1; i>=0; i--) {
+                kanjiSteam[i].update(); kanjiSteam[i].show();
+                if(kanjiSteam[i].done) kanjiSteam.splice(i,1);
+            }
+        }
+
+        // --- 3. CHARACTER RENDERER ---
+        function drawCharacters() {
+            let baseY = height/2 + 50;
+
+            // Kanji
+            push(); translate(width * cPos.k, baseY);
+            if(charAnim.kanjiShake > 0) { translate(random(-2, 2), random(-2, 2)); charAnim.kanjiShake--; }
+            drawPixSprite(sprites.kanji);
+            pop();
+
+            // Naoto
+            push(); translate(width * cPos.n, baseY + 5);
+            if(charAnim.naotoGlitch > 0) {
+                if(frameCount % 4 < 2) translate(random(-5,5), 0);
+                tint(255, 150); charAnim.naotoGlitch--;
+            }
+            drawPixSprite(sprites.naoto); noTint();
+            pop();
+
+            // Rise
+            push(); translate(width * cPos.r, baseY);
+            if(charAnim.riseBounce > 0) {
+                translate(0, -abs(sin(frameCount * 0.2)) * 15); charAnim.riseBounce--;
+            } else {
+                translate(0, sin(frameCount * 0.05) * 3);
+            }
+            drawPixSprite(sprites.rise);
+            pop();
+
+            // Teddie
+            push();
+            if(charAnim.teddieRollX > -100 && charAnim.teddieRollX < width + 100) {
+                translate(charAnim.teddieRollX, baseY + 30);
+                rotate(frameCount * 0.2);
+                drawPixSprite(sprites.teddie, true);
+                charAnim.teddieRollX += 6;
+            } else {
+                translate(width * cPos.t, baseY + 30 + sin(frameCount*0.1)*5);
+                drawPixSprite(sprites.teddie);
+            }
+            pop();
+        }
+
+        function drawPixSprite(spriteMap, centered=false) {
+            noStroke();
+            let w = spriteMap[0].length * spriteScale;
+            let h = spriteMap.length * spriteScale;
+            if(centered) translate(-w/2, -h/2);
+            for(let row=0; row<spriteMap.length; row++) {
+                for(let col=0; col<spriteMap[row].length; col++) {
+                    let char = spriteMap[row][col];
+                    if(colors[char]) { fill(colors[char]); rect(col*spriteScale, row*spriteScale, spriteScale, spriteScale); }
+                }
+            }
+        }
+
+        // --- 4. MINI GAMES ---
+
+        // GAME 1: SKEWERS
+        function startSkewerGame() {
+            gameState = "SKEWER_GAME"; inputLocked = true;
+            uiSet("TAP THE MEAT!");
+            skewers = []; for(let i=0; i<5; i++) skewers.push(new Skewer());
+            timer = 240; score = 0;
+        }
+        function playSkewerGame() {
+            drawTimerBar(timer, 240); timer--;
+            for(let s of skewers) { s.update(); s.show(); }
+            if(timer <= 0 || score >= 3) endGame();
+        }
+
+        // GAME 2: FOG (FIXED VISIBILITY)
+        function startFogGame() {
+            gameState = "FOG_GAME"; inputLocked = true;
+            uiSet("SCRUB THE FOG!");
+            fogParticles = [];
+            // Create lots of dark fog
+            let cols = 15; let rows = 15;
+            for(let i=0; i<cols; i++) {
+                for(let j=0; j<rows; j++) {
+                    fogParticles.push(new FogParticle(
+                        map(i, 0, cols-1, 50, width-50),
+                        map(j, 0, rows-1, 50, height-50)
+                    ));
+                }
+            }
+            timer = 300;
+        }
+        function playFogGame() {
+            drawTimerBar(timer, 300); timer--;
+            for(let f of fogParticles) f.show();
+            // Win Condition
+            if(fogParticles.length < 10 || timer <= 0) endGame();
+        }
+
+        // GAME 3: TUNER
+        function startTuningGame() {
+            gameState = "TUNING_GAME"; inputLocked = true;
+            uiSet("TUNE THE IDIOT");
+            document.getElementById('tuning-container').style.display = 'block';
+            tuningTarget = floor(random(20, 80)); timer = 0;
+        }
+        function playTuningGame() {
+            let val = parseInt(document.getElementById('tuner').value);
+            let diff = abs(val - tuningTarget);
+            push(); translate(width/2, height/2 - 80); scale(3);
+            noStroke(); fill(139, 69, 19); rect(-5,-5, 10, 15);
+            let alpha = map(diff, 0, 50, 0, 255);
+            fill(random(255), alpha); rect(-15,-15,30,30);
+            pop();
+            if(diff < 5) {
+                document.getElementById('game-title').style.color = "#0f0"; timer++;
+            } else {
+                document.getElementById('game-title').style.color = "#FFE600"; timer = 0;
+            }
+            if(timer > 40) {
+                 document.getElementById('tuning-container').style.display = 'none'; endGame();
+            }
+        }
+
+        function uiSet(txt) {
+            document.getElementById('minigame-ui').style.display = 'block';
+            document.getElementById('game-title').innerText = txt;
+            document.getElementById('arrow').style.display = 'none';
+            document.getElementById('ui-layer').style.opacity = '0.2';
+        }
+
+        function endGame() {
+            gameState = "STORY"; inputLocked = false;
+            document.getElementById('minigame-ui').style.display = 'none';
+            document.getElementById('arrow').style.display = 'block';
+            document.getElementById('ui-layer').style.opacity = '1';
+            skewers = []; fogParticles = []; advanceStory();
+        }
+
+        function drawTimerBar(t, maxT) {
+            push(); rectMode(CORNER); noStroke();
+            fill(0); rect(0, height-20, width, 20);
+            fill(255, 0, 50); rect(0, height-20, map(t, 0, maxT, 0, width), 20);
+            pop();
+        }
+
+        // --- 5. INPUT HANDLING ---
+        function mousePressed() { handleSkewerTap(mouseX, mouseY); }
+        function mouseDragged() { scrubFog(mouseX, mouseY); }
+        function touchStarted() { if(touches.length > 0) handleSkewerTap(touches[0].x, touches[0].y); return false; }
+        function touchMoved() { if(touches.length > 0) scrubFog(touches[0].x, touches[0].y); return false; }
+
+        function handleSkewerTap(x, y) {
+            if(gameState === "SKEWER_GAME") {
+                for(let i = skewers.length-1; i>=0; i--) {
+                    if(dist(x, y, skewers[i].pos.x, skewers[i].pos.y) < 60) {
+                        skewers.splice(i, 1); score++; confetti.push(new Confetti(x, y));
+                    }
+                }
+            }
+        }
+
+        function scrubFog(x, y) {
+            if(gameState !== "FOG_GAME") return;
+            for(let i=fogParticles.length-1; i>=0; i--) {
+                if(dist(x, y, fogParticles[i].x, fogParticles[i].y) < 60) {
+                    fogParticles.splice(i, 1);
+                }
+            }
+        }
+
+        let currentIndex = -1;
+        function handleInput() {
+            if(inputLocked || gameState === 'END') return;
+            currentIndex++;
+            if(currentIndex >= story.length) return;
+            const s = story[currentIndex];
+            
+            if(s.type === 'minigame_skewer') { startSkewerGame(); return; }
+            if(s.type === 'minigame_fog') { startFogGame(); return; }
+            if(s.type === 'minigame_tuning') { startTuningGame(); return; }
+
+            document.getElementById('typing-text').innerHTML = s.text;
+            if(s.effect === 'kanjiSteam') charAnim.kanjiShake = 60;
+            if(s.effect === 'teddieRoll') charAnim.teddieRollX = -50;
+            if(s.effect === 'end') {
+                gameState = 'END';
+                document.getElementById('canvas-container').style.opacity = "0.2";
+                document.getElementById('speaker').style.display = 'none';
+            }
+            if(s.anim === 'shakeKanji') charAnim.kanjiShake = 40;
+            if(s.anim === 'glitchNaoto') charAnim.naotoGlitch = 60;
+            if(s.anim === 'bounceRise') charAnim.riseBounce = 60;
+            if(s.anim === 'spinTeddie') charAnim.teddieRollX = width*cPos.t;
+
+            const spk = document.getElementById('speaker');
+            if(s.speaker) {
+                spk.style.display = 'block'; spk.innerText = s.speaker;
+                spk.style.backgroundColor = (s.speaker==='Kanji'?'#ff5252': s.speaker==='Naoto'?'#448aff': s.speaker==='Rise'?'#ff4081':'#fff');
+            } else { spk.style.display = 'none'; }
+        }
+
+        // --- 6. CLASSES ---
+        class FogParticle {
+            constructor(x,y) { this.x=x; this.y=y; this.s=random(50,90); }
+            // DARK FOG for better visibility
+            show() { fill(80, 80, 80, 220); noStroke(); ellipse(this.x, this.y, this.s); }
+        }
+        class Steam {
+            constructor(x,y) { this.x=x; this.y=y; this.life=255; }
+            update() { this.y-=3; this.x+=random(-1,1); this.life-=8; }
+            show() { fill(255, this.life); noStroke(); rect(this.x, this.y, 8, 8); }
+            get done() { return this.life < 0; }
+        }
+        class Skewer {
+            constructor() { this.pos = createVector(random(100, width-100), random(100, height-100)); this.vel = createVector(random(-15,15), random(-15,15)); }
+            update() { this.pos.add(this.vel); if(this.pos.x<0||this.pos.x>width)this.vel.x*=-1; if(this.pos.y<0||this.pos.y>height)this.vel.y*=-1; }
+            show() { push(); translate(this.pos.x, this.pos.y); rotate(frameCount*0.4); fill(139,69,19); rect(-15,-5,30,10); pop(); }
+        }
+        class Building {
+            constructor(x) { this.x=x; this.w=random(40,70); this.h=random(150,350); }
+            update() { this.x-=0.5; if(this.x<-70)this.x=width+70; }
+            show() { fill(30); noStroke(); rect(this.x, -this.h, this.w, this.h); if(frameCount%60<30) { fill(255,255,0,150); rect(this.x+5, -this.h+20, 10, 10); }}
+        }
+        class Cloud { constructor(){this.reset();} reset(){this.x=random(width); this.y=random(height*0.3); this.speed=random(0.5, 1.5);} update(){this.x+=this.speed; if(this.x>width+100)this.x=-100; if(frameCount%900==0)this.reset();} show(){noStroke(); fill(255,180); rect(this.x,this.y,100,40,20);}}
+        class Confetti { constructor(x,y){this.x=x;this.y=y;this.c=color(random(255),random(255),0);} update(){this.y+=6;} show(){fill(this.c);noStroke();rect(this.x,this.y,6,6);}}
+        
+        function drawFloor() { noStroke(); let horizon=height/2+50; for(let y=horizon;y<height;y+=25){for(let x=0;x<width;x+=50){fill((x+y)%100===0?40:60); let p=map(y,horizon,height,0.5,1.5); rect(x,y,50*p,25);}}}
+        function setGradient(x,y,w,h,c1,c2){ noFill(); for(let i=y;i<=y+h;i++){ let inter=map(i,y,y+h,0,1); stroke(lerpColor(c1,c2,inter)); line(x,i,x+w,i);}}
+        function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+    </script>
+</body>
+</html>

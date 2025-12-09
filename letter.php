@@ -1,0 +1,296 @@
+<?php
+session_start();
+require 'db.php';
+
+// Prevent Caching
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+if (!isset($_SESSION['user_id'])) { header("Location: index.php"); exit(); }
+
+// 1. SECURITY: VERIFY TRUE ENDING
+// Only allow access if they actually guessed Yukiko Amagi
+try {
+    $stmt = $pdo->prepare("SELECT guessed_char FROM shadow_guesses WHERE operative_id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $guess = $stmt->fetchColumn();
+    
+    if ($guess !== 'Yukiko Amagi') {
+        header("Location: home.php");
+        exit();
+    }
+} catch (Exception $e) {
+    header("Location: home.php");
+    exit();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Letter</title>
+    <link rel="stylesheet" href="assets/style.css?v=53"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0c;
+            --bg-paper: rgba(255, 255, 255, 0.02);
+            --text-primary: #e0ded8;
+            --text-secondary: #9a9a9a;
+            --text-dim: #5a5a5a;
+            --accent-hope: #6aadff;
+            --accent-warm: #e8c88d;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Crimson Text', Georgia, serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 2;
+            font-size: 17px;
+            min-height: 100vh;
+        }
+
+        /* Subtle Noise Texture */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.025; pointer-events: none; z-index: 1000;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header { text-align: center; padding: 4rem 2rem 2rem; opacity: 0; animation: fadeIn 1s ease 0.3s forwards; }
+        .header-icon { font-size: 1.2rem; color: var(--accent-hope); margin-bottom: 1rem; opacity: 0.7; letter-spacing: 0.5em; }
+        .header-label { font-family: 'Outfit', sans-serif; font-weight: 300; font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.5rem; }
+        .header-title { font-family: 'Caveat', cursive; font-weight: 400; font-size: 2.2rem; color: var(--text-primary); }
+
+        .letter-container { max-width: 520px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+        .letter {
+            background: var(--bg-paper);
+            border: 1px solid var(--border-subtle);
+            border-radius: 2px; padding: 2.5rem 2rem;
+            opacity: 0; animation: fadeIn 1s ease 0.6s forwards;
+            margin-bottom: 2rem;
+        }
+
+        .letter-salutation { color: var(--text-secondary); font-style: italic; margin-bottom: 1.5rem; }
+        .letter p { margin-bottom: 1.25rem; }
+        .letter em { font-style: italic; color: var(--accent-warm); }
+        .emphasis-block { text-align: center; margin: 1.5rem 0; font-style: italic; color: var(--accent-hope); font-size: 1.05rem; }
+        .section-break { text-align: center; margin: 1.5rem 0; color: var(--text-dim); font-size: 0.8rem; letter-spacing: 0.5em; }
+
+        .letter-closing { margin-top: 1.5rem; text-align: right; }
+        .letter-signature { font-family: 'Caveat', cursive; font-size: 1.3rem; color: var(--accent-hope); margin-top: 0.5rem; }
+        
+        sup { color: var(--accent-hope); font-size: 0.6rem; margin-left: 1px; opacity: 0.7; }
+
+        .source-links { list-style: none; padding: 0; margin-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1.5rem; }
+        .source-links li { margin-bottom: 0.8rem; font-size: 0.85rem; font-family: 'Outfit', sans-serif; color: var(--text-dim); }
+        .source-links a { color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease; }
+        .source-links a:hover { color: var(--accent-hope); }
+        .source-links .index { color: var(--text-dim); margin-right: 8px; font-size: 0.75rem; }
+
+        .footer { text-align: center; padding: 3rem 2rem; padding-bottom: 6rem; }
+        .footer-text { font-family: 'Outfit', sans-serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
+        .footer-icon { margin-top: 1rem; font-size: 1rem; color: var(--accent-hope); opacity: 0.5; }
+
+        /* Return Button Style */
+        .btn-return {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            border: 1px solid var(--accent-hope);
+            color: var(--accent-hope);
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .btn-return:hover {
+            background: var(--accent-hope);
+            color: #000;
+        }
+        
+        /* Music Control */
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2000;
+            transition: all 0.3s;
+        }
+        .music-btn:hover, .music-btn.playing {
+            color: var(--accent-hope);
+            border-color: var(--accent-hope);
+            background: rgba(106, 173, 255, 0.1);
+            box-shadow: 0 0 10px rgba(106, 173, 255, 0.2);
+        }
+
+        @media (max-width: 400px) {
+            body { font-size: 16px; }
+            .letter { padding: 2rem 1.5rem; }
+            .header-title { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgm" loop>
+        <source src="assets/audio/letter.mp3" type="audio/mpeg">
+    </audio>
+
+    <button class="music-btn" onclick="toggleMusic()" id="music-toggle" title="Toggle Music">
+        <i class="fa-solid fa-volume-xmark" id="music-icon"></i>
+    </button>
+
+    <header class="header">
+        <div class="header-icon">✦ ✦ ✦</div>
+        <div class="header-label">You received</div>
+        <h1 class="header-title">A Letter</h1>
+    </header>
+
+    <main class="letter-container">
+        <article class="letter">
+            <p class="letter-salutation">To the one who found me,</p>
+
+            <p>I’m sorry. I know what I did was wrong.</p>
+            <p>I spent so long convincing myself that nobody wanted to deal with my problems. I told myself I was protecting everyone else by staying quiet, by disappearing. I treated my loneliness like a shield. I thought if I stayed hidden, I couldn't be rejected.</p>
+            <p>But I was wrong. I wasn't protecting anyone. I was just starving myself of the one thing that makes us human.</p>
+            <p>When everything finally collapsed—when I was standing there, exposed, waiting for the judgment—something strange happened. People didn't yell. They didn't laugh.</p>
+            <p>They just asked if I was <em>okay</em>.</p>
+            <p>It was so simple. Strangers, stopping their day, just because they saw someone hurting. I kept waiting for the catch, but there wasn't one.</p>
+            <p>I wasted so many years running from connections that were right there waiting for me. I don't get to be the hero of this story, but I’m going to try to earn the kindness I didn't deserve.</p>
+            <p>I have one last request.</p>
+            <p>You saw me when I was trying my hardest to disappear. You didn't look away. You have a gift for seeing people, so please—don't stop with me.</p>
+
+            <p class="emphasis-block">You saw me. Now go see someone else.</p>
+
+            <div class="letter-closing">
+                <p class="letter-signature">— A girl who is learning to stay</p>
+                <p class="letter-signature">Kukiyo</p>
+            </div>
+        </article>
+
+        <article class="letter" style="margin-top: 2rem; background: rgba(106, 173, 255, 0.03); border-color: rgba(106, 173, 255, 0.15);">
+            <div class="section-break" style="margin-top: 0; margin-bottom: 2rem;">✦ ✦ ✦</div>
+            <h2 style="font-family: 'Outfit', sans-serif; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-hope); margin-bottom: 2rem; text-align: center;">From Fiction To Reality</h2>
+
+            <p>The story you just finished was fiction. But the feeling behind it is real.</p>
+            <p>We are living through a "silent distortion." The <strong>World Health Organization</strong> reports that nearly <strong>1 in 4 adults</strong> feel lonely. For young people, that number is even higher.<sup>1</sup></p>
+            <p>The <strong>U.S. Surgeon General</strong> has warned that long-term isolation can be as damaging to our physical health as <strong>smoking 15 cigarettes a day</strong>.<sup>2</sup></p>
+            <p>But if you know <em>Persona</em>, you already possess the antidote.</p>
+            <p>You know that <strong>Social Links</strong> aren't just game mechanics. They are a lesson for reality: <strong>Showing up changes fate.</strong> You don't need to save the world or steal a heart. You just need to be present.</p>
+
+            <div class="section-break">· · ·</div>
+
+            <h3 style="font-family: 'Outfit', sans-serif; font-weight: 400; font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-primary); margin-bottom: 1rem;">The Surprise of Connection</h3>
+
+            <p>It is natural to feel hesitant to reach out. We often worry, <em>"What if I’m bothering them? What if it’s awkward?"</em> But psychology tells us we are often harder on ourselves than we need to be.</p>
+            <p><strong>We underestimate how happy people are to connect.</strong> Research shows that while we predict talking to others will be awkward, the reality is almost always warmer than we expect. We assume rejection, but we usually find connection.<sup>4</sup></p>
+            <p><strong>It isn't just about strangers.</strong> We often overlook the people already in our lives—acquaintances, coworkers, or old friends we've drifted from. Studies find that people who interact with a broad mix of people—not just close family—feel happier and more connected.<sup>5</sup></p>
+            <p><strong>Small moments matter.</strong> You don't need a deep, hours-long talk to make a difference. Even "weak ties"—a text to an old classmate or a chat with a neighbor—significantly improve mental health for both people.<sup>6</sup></p>
+
+            <div class="section-break">· · ·</div>
+
+            <h3 style="font-family: 'Outfit', sans-serif; font-weight: 400; font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-primary); margin-bottom: 1rem;">Your Mission</h3>
+
+            <p>You cannot change hearts by force. But you can do something more powerful: <strong>Notice someone.</strong></p>
+            <p>It doesn't have to be a stranger. Text the friend who has gone quiet. Ask your coworker how they <em>really</em> are. Sit with the family member who usually sits alone.</p>
+            <p>It costs nothing. But to the person who feels invisible, it means everything.</p>
+            <p>The distortion is gone. The world is waiting.</p>
+
+            <div class="section-break">· · ·</div>
+
+            <p class="emphasis-block" style="font-size: 1rem;">Go see someone.</p>
+
+            <div class="letter-closing" style="text-align: center; margin-top: 2rem;">
+                <p style="font-family: 'Outfit', sans-serif; font-size: 0.8rem; letter-spacing: 0.15em; color: var(--text-dim);">IRIS INTERACTIVE FOUNDATION</p>
+                <p style="font-style: italic; color: var(--text-secondary); font-size: 0.95rem;">The Arts Should Be For All</p>
+            </div>
+            
+            <ul class="source-links">
+                <li><span class="index">1</span> <a href="https://www.who.int/groups/commission-on-social-connection" target="_blank">WHO Commission on Social Connection: Global Report (2025)</a></li>
+                <li><span class="index">2</span> <a href="https://www.hhs.gov/sites/default/files/surgeon-general-social-connection-advisory.pdf" target="_blank">U.S. Surgeon General: Our Epidemic of Loneliness (2023)</a></li>
+                <li><span class="index">3</span> <a href="https://link.springer.com/article/10.1007/s10902-020-00298-6" target="_blank">Journal of Happiness Studies: Minimal Interactions (2021)</a></li>
+                <li><span class="index">4</span> <a href="https://psycnet.apa.org/record/2014-28833-001" target="_blank">Journal of Experimental Psychology: Mistakenly Seeking Solitude (2014)</a></li>
+                <li><span class="index">5</span> <a href="https://www.hbs.edu/faculty/Pages/item.aspx?num=62955" target="_blank">Harvard Business School: Relational Diversity (2022)</a></li>
+                <li><span class="index">6</span> <a href="https://journals.sagepub.com/doi/abs/10.1177/0146167214529799" target="_blank">PSPB: The Surprising Power of Weak Ties (2014)</a></li>
+            </ul>
+        </article>
+
+        <div style="text-align: center;">
+            <a href="home.php" class="btn-return">Close Memory</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">The Distortion Has Ended • Go See Someone</p>
+        <div class="footer-icon">✦</div>
+    </footer>
+
+    <script>
+        const audio = document.getElementById('bgm');
+        const btn = document.getElementById('music-toggle');
+        const icon = document.getElementById('music-icon');
+        let isPlaying = false;
+
+        function toggleMusic() {
+            if (isPlaying) {
+                audio.pause();
+                icon.classList.remove('fa-volume-high');
+                icon.classList.add('fa-volume-xmark');
+                btn.classList.remove('playing');
+            } else {
+                audio.volume = 0.3; // Gentle volume
+                audio.play();
+                icon.classList.remove('fa-volume-xmark');
+                icon.classList.add('fa-volume-high');
+                btn.classList.add('playing');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // Try Autoplay on Load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                audio.volume = 0.3;
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        // Autoplay started!
+                        isPlaying = true;
+                        icon.classList.remove('fa-volume-xmark');
+                        icon.classList.add('fa-volume-high');
+                        btn.classList.add('playing');
+                    })
+                    .catch(error => {
+                        // Auto-play was prevented
+                        console.log("Autoplay prevented. User interaction required.");
+                    });
+                }
+            }, 2000); // 2 second delay
+        });
+    </script>
+</body>
+</html>
