@@ -7,11 +7,19 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
 
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <!-- Aggressive cache busting -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
     <title>BUFFERING AT THE FOOD COURT: GOLDEN</title>
+
+    <!-- Force HTTPS redirect -->
+    <script>
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+        }
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
     <style>
@@ -241,6 +249,87 @@
             50% { transform: translate(-50%, -50%) scale(1.05); }
         }
 
+        /* START SCREEN */
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(20px, 5vh, 40px);
+        }
+        #start-screen.hidden {
+            display: none;
+        }
+        #start-title {
+            font-size: clamp(2rem, 10vw, 5rem);
+            color: #FFE600;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8);
+            padding: 0 20px;
+            line-height: 1.2;
+            animation: titleFloat 2s ease-in-out infinite;
+        }
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        #start-subtitle {
+            font-size: clamp(1rem, 4vw, 1.8rem);
+            color: #fff;
+            text-align: center;
+            padding: 0 20px;
+            max-width: 600px;
+        }
+        #start-btn {
+            background: #FFE600;
+            color: #000;
+            border: 5px solid #fff;
+            font-family: 'VT323', monospace;
+            font-size: clamp(2rem, 8vw, 4rem);
+            padding: clamp(20px, 4vh, 40px) clamp(40px, 8vw, 80px);
+            cursor: pointer;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+            touch-action: manipulation;
+            margin-top: 20px;
+        }
+        #start-btn:active {
+            transform: scale(0.95);
+            background: #fff;
+            color: #000;
+        }
+
+        /* RESTART BUTTON */
+        #restart-btn {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-50% + 80px));
+            background: #FFE600;
+            color: #000;
+            border: 5px solid #fff;
+            font-family: 'VT323', monospace;
+            font-size: clamp(1.5rem, 6vw, 3rem);
+            padding: clamp(15px, 3vh, 30px) clamp(30px, 6vw, 60px);
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 120;
+            touch-action: manipulation;
+        }
+        #restart-btn:active {
+            transform: translate(-50%, calc(-50% + 80px)) scale(0.95);
+            background: #fff;
+        }
+
         #version-tag {
             position: fixed; top: 5px; right: 5px; color: rgba(0,0,0,0.4); z-index: 200; font-size: 10px;
         }
@@ -248,7 +337,14 @@
 </head>
 <body>
 
-    <div id="version-tag">v6.0 - COMEDY REWRITE</div>
+    <!-- START SCREEN -->
+    <div id="start-screen">
+        <div id="start-title">BUFFERING AT<br>THE FOOD COURT:<br>GOLDEN</div>
+        <div id="start-subtitle">The Investigation Team gets stuck in the TV World<br>while Senpai has all the fun.</div>
+        <button id="start-btn">START</button>
+    </div>
+
+    <div id="version-tag">v6.1 - START SCREEN</div>
     <div class="scanlines"></div>
     <div id="canvas-container"></div>
 
@@ -285,6 +381,9 @@
     <!-- CLEANUP BUTTON -->
     <button id="cleanup-btn">CLEAR MEMORY</button>
 
+    <!-- RESTART BUTTON -->
+    <button id="restart-btn">RESTART</button>
+
     <div id="minigame-ui">
         <div id="game-title" class="game-instruction">GAME START!</div>
     </div>
@@ -298,6 +397,17 @@
     </div>
 
     <script>
+        // ==========================================
+        // 0. CACHE BUSTING
+        // ==========================================
+        // Force reload from server on every page load
+        if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
+            // First load - add timestamp to prevent caching
+            if (!window.location.search.includes('t=')) {
+                window.location.href = window.location.pathname + '?t=' + new Date().getTime();
+            }
+        }
+
         // ==========================================
         // 1. STORY & CONFIGURATION
         // ==========================================
@@ -1040,6 +1150,11 @@
         document.getElementById('arrow-left').addEventListener('click', () => moveGhost(-1, 0));
         document.getElementById('arrow-right').addEventListener('click', () => moveGhost(1, 0));
 
+        // Start button
+        document.getElementById('start-btn').addEventListener('click', () => {
+            document.getElementById('start-screen').classList.add('hidden');
+        });
+
         // Cleanup button
         document.getElementById('cleanup-btn').addEventListener('click', () => {
             document.getElementById('cleanup-btn').innerText = 'CLEARING...';
@@ -1047,6 +1162,12 @@
                 document.getElementById('cleanup-btn').style.display = 'none';
                 document.getElementById('ui-layer').innerHTML = '<div class="text-box" style="text-align:center; pointer-events:none;"><span style="color:#00FF00;">MEMORY CLEARED</span><br><span style="font-size:clamp(0.8rem, 3vw, 1rem);">Connection persists. Always.</span></div>';
             }, 1000);
+        });
+
+        // Restart button
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            // Force reload with cache bust
+            window.location.href = window.location.pathname + '?t=' + new Date().getTime();
         });
 
         let currentIndex = -1;
@@ -1074,6 +1195,7 @@
                 document.getElementById('speaker').style.display = 'none';
                 document.getElementById('ui-layer').style.opacity = '0.3';
                 document.getElementById('cleanup-btn').style.display = 'block';
+                document.getElementById('restart-btn').style.display = 'block';
             }
 
             if(s.anim === 'shakeKanji') charAnim.kanjiShake = 40;
