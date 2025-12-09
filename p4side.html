@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
+
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -14,13 +17,24 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
-        body {
-            margin: 0; overflow: hidden;
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            position: fixed;
             background-color: #111;
             font-family: 'VT323', monospace;
-            touch-action: none; 
+            touch-action: none;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior: none;
         }
 
         #canvas-container { position: fixed; top: 0; left: 0; z-index: 1; }
@@ -47,7 +61,7 @@
 
         .speaker-box {
             background: #FFE600; color: #111;
-            padding: 5px 20px; font-size: 1.5rem; font-weight: bold;
+            padding: 5px 20px; font-size: clamp(1rem, 4vw, 1.5rem); font-weight: bold;
             width: fit-content; border: 3px solid #fff;
             transform: skew(-15deg) translateX(10px);
             margin-bottom: -5px; z-index: 102; display: none;
@@ -55,15 +69,16 @@
 
         .text-box {
             background: rgba(0, 0, 0, 0.9); border: 3px solid #FFE600;
-            padding: 15px; color: #fff; font-size: 1.4rem; line-height: 1.2;
-            min-height: 100px; clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
-            pointer-events: auto; 
+            padding: 15px; color: #fff; font-size: clamp(1rem, 3.5vw, 1.4rem); line-height: 1.4;
+            min-height: clamp(80px, 15vh, 120px);
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
+            pointer-events: auto;
             position: relative;
         }
 
         .tap-indicator {
             position: absolute; bottom: 10px; right: 15px; color: #FFE600;
-            font-size: 1.2rem;
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
             animation: blink 0.8s infinite;
         }
         @keyframes blink { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
@@ -71,20 +86,72 @@
         /* MINI GAME UI OVERLAYS */
         #minigame-ui {
             position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
-            width: 90%; text-align: center; z-index: 110; display: none;
+            width: 90%; max-width: 600px; text-align: center; z-index: 110; display: none;
             pointer-events: none;
         }
         .game-instruction {
-            font-size: 3.5rem; color: #FFE600; text-shadow: 4px 4px #000;
-            font-weight: bold; line-height: 0.9;
+            font-size: clamp(1.8rem, 8vw, 3.5rem);
+            color: #FFE600;
+            text-shadow: 3px 3px #000;
+            font-weight: bold;
+            line-height: 1.1;
             animation: pop 0.5s infinite alternate;
+            word-wrap: break-word;
         }
         @keyframes pop { from { transform: scale(1) rotate(-2deg); } to { transform: scale(1.1) rotate(2deg); } }
 
-        #tuning-container { pointer-events: auto; width: 100%; display: flex; flex-direction: column; align-items: center;}
+        #tuning-container {
+            pointer-events: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
         input[type=range] {
-            width: 80%; height: 50px; margin-top: 20px;
-            accent-color: #FFE600; cursor: pointer;
+            width: 85%;
+            max-width: 400px;
+            height: 60px;
+            margin-top: 20px;
+            accent-color: #FFE600;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-track {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border: 3px solid #FFE600;
+            border-radius: 5px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 50px;
+            width: 30px;
+            background: #FFE600;
+            cursor: pointer;
+            border: 3px solid #fff;
+            border-radius: 5px;
+            margin-top: -18px;
+        }
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border: 3px solid #FFE600;
+            border-radius: 5px;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 44px;
+            width: 24px;
+            background: #FFE600;
+            cursor: pointer;
+            border: 3px solid #fff;
+            border-radius: 5px;
         }
         
         #version-tag {
@@ -94,7 +161,7 @@
 </head>
 <body>
 
-    <div id="version-tag">v5.0 - CITY UPDATE</div>
+    <div id="version-tag">v5.1 - MOBILE FIX</div>
     <div class="scanlines"></div>
     <div id="canvas-container"></div>
 
@@ -102,7 +169,7 @@
         <div id="game-title" class="game-instruction">GAME START!</div>
         
         <div id="tuning-container" style="display:none; margin-top:20px;">
-            <p style="color:white; font-size:1.5rem; background:black; display:inline-block; padding:5px;">DRAG TO TUNE</p><br>
+            <p style="color:white; font-size:clamp(1rem, 4vw, 1.5rem); background:black; display:inline-block; padding:10px; border: 2px solid #FFE600;">DRAG TO TUNE</p><br>
             <input type="range" id="tuner" min="0" max="100" value="0">
         </div>
     </div>
@@ -207,7 +274,7 @@
         // ==========================================
         // 3. SPRITE MAPS
         // ==========================================
-        const spriteScale = 4;
+        let spriteScale = 4; // Will be adjusted based on screen size
         const sprites = {
             kanji: [
                 "  HHHH  ", " HHHHHH ", "HSSSSSSH", " SBBSSB ", " SSSSSS ",
@@ -236,18 +303,40 @@
         // 4. P5.JS SETUP & DRAW
         // ==========================================
         function setup() {
-            let cnv = createCanvas(windowWidth, windowHeight);
+            // Get actual viewport dimensions
+            let w = window.innerWidth;
+            let h = window.innerHeight;
+
+            let cnv = createCanvas(w, h);
             cnv.parent('canvas-container');
-            noSmooth(); 
+            noSmooth();
             rectMode(CORNER);
-            
-            // Create Skyline Layers
+
+            // Adjust sprite scale based on screen width
+            if(w < 400) {
+                spriteScale = 2.5;
+            } else if(w < 600) {
+                spriteScale = 3;
+            } else if(w < 800) {
+                spriteScale = 3.5;
+            } else {
+                spriteScale = 4;
+            }
+
+            // Mobile detection and performance optimization
+            let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if(isMobile) {
+                frameRate(30); // Limit framerate on mobile
+            }
+
+            // Create Skyline Layers - fewer buildings on mobile
+            let buildingCount = isMobile ? 5 : 8;
             // Back layer: Darker, slower, taller
-            for(let i=0; i<8; i++) {
+            for(let i=0; i<buildingCount; i++) {
                 backCity.push(new DetailedBuilding(i * 200, 0.5, 'BACK'));
             }
             // Front layer: Lighter, faster, detailed windows
-            for(let i=0; i<8; i++) {
+            for(let i=0; i<buildingCount; i++) {
                 frontCity.push(new DetailedBuilding(i * 180, 1.5, 'FRONT'));
             }
 
@@ -297,7 +386,25 @@
             }
         }
 
-        function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+        function windowResized() {
+            // Use actual viewport dimensions for better mobile support
+            let w = window.innerWidth;
+            let h = window.innerHeight;
+            resizeCanvas(w, h);
+
+            // Recalculate sprite scale for new width
+            if(w < 400) {
+                spriteScale = 2.5;
+            } else if(w < 600) {
+                spriteScale = 3;
+            } else if(w < 800) {
+                spriteScale = 3.5;
+            } else {
+                spriteScale = 4;
+            }
+
+            charAnim.teddieRollX = width * cPos.t;
+        }
 
         // ==========================================
         // 5. CITY GENERATION CLASSES
@@ -472,7 +579,9 @@
         function playSkewerGame() {
             drawTimerBar(timer, 300); timer--;
             for(let s of skewers) { s.update(); s.show(); }
-            fill(0); textSize(20); textAlign(CENTER);
+            fill(0);
+            textSize(max(16, width * 0.03)); // Responsive text size
+            textAlign(CENTER);
             text("CAPTURED: " + score + "/4", width/2, 80);
             if(score >= 4) { endGame(); }
             else if (timer <= 0) { timer = 200; skewers.push(new Skewer()); }
@@ -486,13 +595,16 @@
         }
         function playSignalGame() {
             if(frameCount % 2 == 0 && signalPower > 0) signalPower -= 1;
-            
+
             let staticAlpha = map(signalPower, 0, 100, 200, 0);
             fill(20, 20, 20, staticAlpha); noStroke(); rect(0, 0, width, height);
 
-            let barW = 200; let barH = 40;
-            let bx = width/2 - barW/2; let by = height/2 - barH/2;
-            
+            // Responsive bar sizing
+            let barW = min(300, width * 0.6);
+            let barH = max(30, min(50, height * 0.06));
+            let bx = width/2 - barW/2;
+            let by = height/2 - barH/2;
+
             fill(0); stroke(255); strokeWeight(3); rect(bx, by, barW, barH);
             let fillW = map(signalPower, 0, 100, 0, barW);
             if(fillW > barW) fillW = barW;
@@ -500,7 +612,10 @@
             if(signalPower > 80) fill(0, 255, 0); else fill(255, 0, 50);
             rect(bx+3, by+3, fillW-6, barH-6);
 
-            fill(255); textAlign(CENTER); textSize(20); noStroke();
+            fill(255);
+            textAlign(CENTER);
+            textSize(max(14, width * 0.025)); // Responsive text
+            noStroke();
             text("CONNECTION POWER", width/2, by - 15);
             text(floor(signalPower) + "%", width/2, by + barH + 25);
             if(signalPower >= 100) endGame();
@@ -562,17 +677,40 @@
         }
 
         // INPUT
-        function mousePressed() { handleSkewerTap(mouseX, mouseY); handleSignalTap(); }
-        function touchStarted() { 
-            if(touches.length > 0) { handleSkewerTap(touches[0].x, touches[0].y); handleSignalTap(); }
-            return false; 
+        function mousePressed() {
+            handleSkewerTap(mouseX, mouseY);
+            handleSignalTap();
+            return false;
         }
+
+        function touchStarted(event) {
+            // Prevent default touch behavior
+            if(event) event.preventDefault();
+
+            if(touches.length > 0) {
+                handleSkewerTap(touches[0].x, touches[0].y);
+                handleSignalTap();
+            }
+            return false;
+        }
+
+        function touchMoved(event) {
+            // Prevent scrolling while playing
+            if(event) event.preventDefault();
+            return false;
+        }
+
         function handleSkewerTap(x, y) {
             if(gameState === "SKEWER_GAME") {
+                // Increased hit area for mobile - 100 instead of 80
+                let hitRadius = 100;
+                let isMobile = width < 768;
+                let confettiCount = isMobile ? 5 : 10; // Fewer particles on mobile
+
                 for(let i = skewers.length-1; i>=0; i--) {
-                    if(dist(x, y, skewers[i].pos.x, skewers[i].pos.y) < 80) {
-                        skewers.splice(i, 1); score++; 
-                        for(let k=0; k<10; k++) confetti.push(new Confetti(x, y));
+                    if(dist(x, y, skewers[i].pos.x, skewers[i].pos.y) < hitRadius) {
+                        skewers.splice(i, 1); score++;
+                        for(let k=0; k<confettiCount; k++) confetti.push(new Confetti(x, y));
                     }
                 }
             }
