@@ -347,25 +347,29 @@
             { type: 'dialogue', speaker: "Rise", text: "I can feel them... they're at the Tea Bar. Senpai's doing great.", effect: 'scanActive' },
             { type: 'dialogue', speaker: "Rise", text: "Chie-senpai is excited. Yukiko-senpai is having fun." },
             { type: 'dialogue', speaker: "Teddie", text: "What about Yosuke? What's he doing?" },
+            { type: 'dialogue', speaker: "Rise", text: "He's... looking at a display of keychains. Walking toward it. Oh no, he's not watching where—" },
 
-            // ACT III: YOSUKE PREDICTIONS
-            { type: 'minigame_betting', text: "PREDICT YOSUKE'S NEXT MISTAKE!" },
+            // ACT III: YOSUKE PREDICTIONS - Round 1 (trips)
+            { type: 'minigame_betting', text: "PREDICT YOSUKE'S NEXT MISTAKE!", betRound: 0, correctAnswer: 0 },
 
-            { type: 'dialogue', speaker: "Rise", text: "There are other realities bleeding through. A Knight? A Proxy?", effect: 'scanActive' },
+            { type: 'dialogue', speaker: "Rise", text: "Called it! He just face-planted!", anim: 'bounceRise' },
+            { type: 'dialogue', speaker: "Kanji", text: "Classic.", anim: 'shakeKanji' },
+            { type: 'dialogue', speaker: "Rise", text: "Wait, there are other realities bleeding through. A Knight? A Proxy?", effect: 'scanActive' },
             { type: 'dialogue', speaker: "Naoto", text: "The cognitive space is hosting multiple narrative frameworks. Fascinating." },
-            { type: 'dialogue', speaker: "Rise", text: "Wait... he's at it again!" },
+            { type: 'dialogue', speaker: "Rise", text: "Okay, he's getting up now. He's grabbing a drink to recover from the embarrassment..." },
 
-            { type: 'minigame_betting', text: "PREDICT YOSUKE'S NEXT MISTAKE!" },
+            { type: 'minigame_betting', text: "PREDICT YOSUKE'S NEXT MISTAKE!", betRound: 1, correctAnswer: 1 },
 
+            { type: 'dialogue', speaker: "Rise", text: "And there it goes! All over the Koromaru plushies!", anim: 'bounceRise' },
             { type: 'dialogue', speaker: "Teddie", text: "YES! His suffering gives me life!", anim: 'spinTeddie' },
             { type: 'dialogue', speaker: "Kanji", text: "Are we... are we cursing him?", anim: 'shakeKanji' },
             { type: 'narration', text: "The four of them looked at each other." },
             { type: 'dialogue', speaker: "Rise", text: "No, no. He's just naturally like this." },
             { type: 'dialogue', speaker: "Naoto", text: "Statistically proven." },
             { type: 'dialogue', speaker: "Teddie", text: "It's science!", anim: 'bounceRise' },
-            { type: 'dialogue', speaker: "Rise", text: "One more prediction..." },
+            { type: 'dialogue', speaker: "Rise", text: "One more... He's picking up a ceramic teacup now. It's one of those expensive limited edition—" },
 
-            { type: 'minigame_betting', text: "FINAL PREDICTION!" },
+            { type: 'minigame_betting', text: "FINAL PREDICTION!", betRound: 2, correctAnswer: 2 },
 
             { type: 'narration', text: "The four of them dissolved into laughter.", effect: 'scanEnd' },
             { type: 'dialogue', speaker: "Kanji", text: "Maybe being stuck here ain't so bad." },
@@ -419,6 +423,8 @@
         ];
         let currentBetIndex = 0;
         let betLocked = false;
+        let betRound = 0;
+        let teddieAppeared = false;
 
         let charAnim = { kanjiShake: 0, riseBounce: 0, naotoGlitch: 0, teddieSpin: 0, teddieShake: 0, riseGlow: false };
         let cPos = { k:0.15, n:0.40, r:0.65, t:0.85 };
@@ -429,8 +435,8 @@
         let spriteScale = 4;
         const sprites = {
             kanji: [
-                "  HHHH  ", " HHHHHH ", "HSSSSSSH", " SBBSSB ", " SSSSSS ",
-                "CCCCCCCC", "C CACC C", "C CACC C", "CCCCCCCC", " L L  L L", " L L  L L"
+                "  YYYY  ", " YYYYYY ", "YSSSSSSY", " SBBSSB ", " SSSSSS ",
+                "KKKKKKWK", "K DKKD K", "K DWWD K", "KKKKKKWK", " L L  L L", " L L  L L"
             ],
             naoto: [
                 "  CCCC  ", " CCCCCC ", "HSSSSSSH", " S B S B", " SSSSSS ",
@@ -448,7 +454,8 @@
         const colors = {
             'H': '#8B4513', 'S': '#FFDAB9', 'B': '#1a1a1a', 'C': '#000080',
             'A': '#FFFFFF', 'L': '#050505', 'J': '#0000CD', 'Y': '#FFD700',
-            'P': '#FF69B4', 'K': '#A9A9A9', 'W': '#FFFFFF', 'R': '#DC143C'
+            'P': '#FF69B4', 'K': '#1a1a1a', 'W': '#FFFFFF', 'R': '#DC143C',
+            'D': '#2a2a2a'
         };
 
         // ==========================================
@@ -488,6 +495,9 @@
         }
 
         function draw() {
+            // Clear and fill entire background first
+            background(135, 206, 250);
+
             // NOON CITY SKYVIEW BACKGROUND
             // Sky gradient - light blue to deeper blue
             setGradient(0, 0, width, height/2, color(135, 206, 250), color(70, 130, 180));
@@ -497,6 +507,9 @@
 
             // Clouds in sky
             for(let c of clouds) { c.update(); c.show(); }
+
+            // Save state before shake
+            push();
 
             // Screen shake from rage
             if(screenShake > 0) {
@@ -562,6 +575,9 @@
                 ellipse(ghostPos.x - 8, ghostPos.y - 5, 8, 8);
                 ellipse(ghostPos.x + 8, ghostPos.y - 5, 8, 8);
             }
+
+            // Restore state after shake
+            pop();
         }
 
         function drawSun() {
@@ -726,8 +742,8 @@
             drawPixSprite(sprites.rise);
             pop();
 
-            // Teddie (only if not in teddie game)
-            if(gameState !== "TEDDIE_GAME") {
+            // Teddie (only show after he's been caught, and not during teddie game)
+            if(teddieAppeared && gameState !== "TEDDIE_GAME") {
                 push();
                 if(charAnim.teddieSpin > 0) {
                     translate(width * cPos.t + 16, baseY + 20);
@@ -762,7 +778,8 @@
         // RAGE METER GAME
         function startRageGame() {
             gameState = "RAGE_GAME"; inputLocked = true;
-            uiSet("TAP TO HELP KANJI!");
+            uiSet("TAP RAPIDLY TO FILL KANJI'S RAGE!");
+            document.getElementById('minigame-ui').innerHTML = '<div class="game-instruction">TAP RAPIDLY TO FILL KANJI\'S RAGE!<br><span style="font-size:0.6em;">Get to 100% or wait for time to run out</span></div>';
             document.getElementById('rage-meter-container').style.display = 'block';
             rageMeter = 0;
             timer = 0;
@@ -818,7 +835,10 @@
         // TEDDIE BOUNCE GAME
         function startTeddieGame() {
             gameState = "TEDDIE_GAME"; inputLocked = true;
-            uiSet("CATCH TEDDIE!");
+            document.getElementById('minigame-ui').innerHTML = '<div class="game-instruction">TAP TEDDIE TO CATCH HIM!<br><span style="font-size:0.6em;">Catch him before he bounces 3 times!</span></div>';
+            document.getElementById('minigame-ui').style.display = 'block';
+            document.getElementById('arrow').style.display = 'none';
+            document.getElementById('ui-layer').style.opacity = '0.2';
             teddieY = -100;
             teddieVel = 2;
             teddieBounces = 0;
@@ -850,7 +870,8 @@
                 }
 
                 if(teddieBounces >= 3) {
-                    // Caught after bounces
+                    // Caught after bounces (auto-complete)
+                    teddieAppeared = true;
                     endGame();
                 }
             }
@@ -861,6 +882,7 @@
                 let hitRadius = 100;
                 if(dist(x, y, teddieX, teddieY) < hitRadius) {
                     // Successfully caught!
+                    teddieAppeared = true;
                     for(let i=0; i<20; i++) {
                         confetti.push(new Confetti(teddieX, teddieY));
                     }
@@ -876,8 +898,14 @@
             document.getElementById('ui-layer').style.opacity = '0.2';
             document.getElementById('minigame-ui').style.display = 'none';
 
-            // Randomize correct answer
-            currentBetIndex = floor(random(3));
+            // Get correct answer from story if provided, otherwise random
+            let storyEntry = story[currentIndex];
+            if(storyEntry && storyEntry.correctAnswer !== undefined) {
+                currentBetIndex = storyEntry.correctAnswer;
+            } else {
+                currentBetIndex = floor(random(3));
+            }
+
             betLocked = false;
             document.getElementById('bet-result').innerText = '';
             document.getElementById('bet-result').style.color = '#FFE600';
@@ -917,6 +945,8 @@
             isGhostMode = true;
             document.getElementById('ghost-controls').style.display = 'block';
             document.getElementById('ui-layer').style.opacity = '0.3';
+            document.getElementById('minigame-ui').innerHTML = '<div class="game-instruction">EXPLORE AS A GHOST!<br><span style="font-size:0.6em;">Use arrow keys or buttons to move around</span></div>';
+            document.getElementById('minigame-ui').style.display = 'block';
             ghostPos.x = width / 2;
             ghostPos.y = height / 2;
             ghostTrail = [];
@@ -933,6 +963,7 @@
             if(timer > 300) {
                 // Auto-end after exploration
                 document.getElementById('ghost-controls').style.display = 'none';
+                document.getElementById('minigame-ui').style.display = 'none';
                 document.getElementById('ui-layer').style.opacity = '1';
                 endGame();
             }
