@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
     <title>The Memory Patch</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,600;1,400&display=swap');
@@ -16,18 +19,29 @@
             --thread-color: #e0e0e0;
         }
 
-        body {
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
             margin: 0;
+            padding: 0;
             overflow: hidden;
+            width: 100%;
+            height: 100%;
+            position: fixed;
             background-color: var(--p3-dark);
             background: radial-gradient(circle at 50% 30%, #1a2a5e 0%, #050810 80%);
             font-family: 'Exo 2', sans-serif;
             color: white;
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior: none;
         }
 
         #game-ui {
@@ -38,7 +52,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 40px;
+            padding: clamp(15px, 5vw, 40px);
             box-sizing: border-box;
             z-index: 10;
         }
@@ -46,19 +60,25 @@
         /* Top Right Counter */
         #level-indicator {
             position: absolute;
-            top: 30px; right: 40px;
+            top: clamp(15px, 4vw, 30px);
+            right: clamp(15px, 5vw, 40px);
             text-align: right;
-            border-right: 4px solid var(--p3-light-blue);
-            padding-right: 20px;
+            border-right: clamp(2px, 0.5vw, 4px) solid var(--p3-light-blue);
+            padding-right: clamp(10px, 3vw, 20px);
             transition: opacity 0.5s;
         }
         #act-label {
-            font-size: 0.8rem; letter-spacing: 3px; color: var(--p3-light-blue);
+            font-size: clamp(0.6rem, 2vw, 0.8rem);
+            letter-spacing: clamp(1px, 0.5vw, 3px);
+            color: var(--p3-light-blue);
         }
         #level-title {
-            font-size: 2.2rem; font-weight: 800;
-            text-transform: uppercase; font-style: italic;
-            color: white; letter-spacing: 1px;
+            font-size: clamp(1.2rem, 5vw, 2.2rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-style: italic;
+            color: white;
+            letter-spacing: 1px;
             text-shadow: 2px 2px 0px var(--p3-blue);
         }
 
@@ -76,15 +96,16 @@
 
         /* Standard Game Text */
         #narrative {
-            width: 60%; max-width: 700px;
+            width: 85%;
+            max-width: 700px;
             text-align: center;
             font-style: italic;
-            font-size: 1.4rem;
+            font-size: clamp(1rem, 3.5vw, 1.4rem);
             line-height: 1.5;
             color: var(--p3-cyan);
             text-shadow: 0 0 15px rgba(99, 164, 255, 0.4);
             background: rgba(8, 11, 20, 0.8);
-            padding: 25px;
+            padding: clamp(15px, 4vw, 25px);
             border-left: 3px solid var(--p3-light-blue);
             backdrop-filter: blur(5px);
             opacity: 0;
@@ -95,8 +116,9 @@
         /* Full Screen Text Mode */
         #story-mode-text {
             display: none;
-            font-size: 1.8rem;
-            max-width: 800px;
+            font-size: clamp(1.2rem, 4.5vw, 1.8rem);
+            max-width: 90%;
+            padding: 20px;
             text-align: center;
             color: white;
             line-height: 1.6;
@@ -105,9 +127,9 @@
             transition: opacity 0.5s;
         }
         .story-hint {
-            font-size: 0.9rem;
+            font-size: clamp(0.7rem, 2.5vw, 0.9rem);
             color: var(--p3-light-blue);
-            margin-top: 40px;
+            margin-top: clamp(20px, 5vw, 40px);
             text-transform: uppercase;
             letter-spacing: 2px;
             animation: pulse 2s infinite;
@@ -115,12 +137,17 @@
 
         /* Bottom Instruction */
         #instructions {
-            position: absolute; bottom: 40px; width: 100%;
+            position: absolute;
+            bottom: clamp(20px, 5vw, 40px);
+            width: 100%;
             text-align: center;
-            font-size: 1rem; letter-spacing: 2px;
-            text-transform: uppercase; font-weight: bold;
+            font-size: clamp(0.75rem, 2.5vw, 1rem);
+            letter-spacing: clamp(1px, 0.3vw, 2px);
+            text-transform: uppercase;
+            font-weight: bold;
             color: rgba(255, 255, 255, 0.6);
             transition: opacity 0.5s;
+            padding: 0 20px;
         }
 
         canvas {
@@ -144,25 +171,171 @@
             cursor: default;
         }
         #end-screen h1 {
-            font-size: 4rem; margin: 0;
-            transform: skew(-10deg); color: white;
+            font-size: clamp(2rem, 8vw, 4rem);
+            margin: 0;
+            transform: skew(-10deg);
+            color: white;
             border-bottom: 5px solid var(--sees-red);
             padding-bottom: 10px;
         }
         #end-screen p {
-            font-size: 1.4rem; color: var(--p3-cyan);
-            margin-top: 30px; max-width: 600px;
-            text-align: center; line-height: 1.6;
+            font-size: clamp(1rem, 3.5vw, 1.4rem);
+            color: var(--p3-cyan);
+            margin-top: 30px;
+            max-width: 90%;
+            padding: 0 20px;
+            text-align: center;
+            line-height: 1.6;
         }
         button {
-            margin-top: 50px; background: transparent; border: 2px solid var(--p3-cyan);
-            color: var(--p3-cyan); padding: 15px 50px;
-            font-size: 1rem; letter-spacing: 2px; font-family: 'Exo 2', sans-serif;
-            text-transform: uppercase; font-weight: bold; cursor: pointer; transition: all 0.3s;
+            margin-top: clamp(30px, 6vw, 50px);
+            background: transparent;
+            border: 2px solid var(--p3-cyan);
+            color: var(--p3-cyan);
+            padding: clamp(12px, 3vw, 15px) clamp(30px, 8vw, 50px);
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            letter-spacing: 2px;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            pointer-events: auto;
         }
-        button:hover {
-            background: var(--p3-cyan); color: var(--p3-dark);
+        button:hover, button:active {
+            background: var(--p3-cyan);
+            color: var(--p3-dark);
             box-shadow: 0 0 25px var(--p3-light-blue);
+        }
+
+        /* NEW MECHANICS UI */
+
+        /* Discard Button (ACT I) */
+        #discard-btn {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ff0000, #990000);
+            border: 3px solid #ffffff;
+            color: white;
+            padding: clamp(15px, 4vw, 25px) clamp(40px, 10vw, 80px);
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            letter-spacing: 3px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            z-index: 50;
+            pointer-events: auto;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            animation: glow 1.5s ease-in-out infinite;
+            transition: all 0.3s;
+        }
+        #discard-btn:hover, #discard-btn:active {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 0 60px rgba(255, 0, 0, 1);
+        }
+        #discard-btn.rejected {
+            animation: reject 0.5s ease-out;
+            pointer-events: none;
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2); }
+            50% { box-shadow: 0 0 60px rgba(255, 0, 0, 1), inset 0 0 30px rgba(255, 255, 255, 0.3); }
+        }
+        @keyframes reject {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+        }
+
+        /* Speed Warning (ACT II) */
+        #speed-warning {
+            display: none;
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff6b6b;
+            font-size: clamp(1rem, 3.5vw, 1.5rem);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.8);
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        /* Long Press Indicator (ACT V) */
+        #longpress-indicator {
+            display: none;
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            pointer-events: none;
+            z-index: 40;
+        }
+        #longpress-text {
+            color: var(--p3-cyan);
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(99, 164, 255, 0.6);
+        }
+        #longpress-bar {
+            width: clamp(200px, 50vw, 400px);
+            height: clamp(15px, 3vw, 25px);
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid var(--p3-light-blue);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        #longpress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--p3-light-blue), var(--p3-cyan));
+            transition: width 0.1s linear;
+            box-shadow: 0 0 15px var(--p3-light-blue);
+        }
+
+        /* Pristine Replacement (ACT V) */
+        #pristine-replacement {
+            display: none;
+            position: absolute;
+            top: 20%;
+            right: 10%;
+            width: clamp(100px, 20vw, 180px);
+            height: clamp(120px, 25vw, 220px);
+            background: linear-gradient(135deg, var(--sees-red), #ff4d6a);
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 5;
+            animation: float 3s ease-in-out infinite;
+        }
+        #pristine-label {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-style: italic;
+            white-space: nowrap;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
         }
 
     </style>
@@ -188,6 +361,19 @@
 </div>
 
 <canvas id="gameCanvas"></canvas>
+
+<!-- New Mechanic UI Elements -->
+<button id="discard-btn">DISCARD & REPLACE</button>
+<div id="speed-warning">TOO FAST - THREAD SNAPPING!</div>
+<div id="longpress-indicator">
+    <div id="longpress-text">Hold to Commit...</div>
+    <div id="longpress-bar">
+        <div id="longpress-fill"></div>
+    </div>
+</div>
+<div id="pristine-replacement">
+    <div id="pristine-label">Pristine Replacement</div>
+</div>
 
 <div id="end-screen">
     <h1>INTEGRITY RESTORED</h1>
@@ -301,7 +487,7 @@
     // --- Engine Variables ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    
+
     // UI Elements
     const uiLvlInd = document.getElementById('level-indicator');
     const uiAct = document.getElementById('act-label');
@@ -312,30 +498,50 @@
     const uiInstruct = document.getElementById('instructions');
     const endScreen = document.getElementById('end-screen');
 
+    // New Mechanic UI Elements
+    const discardBtn = document.getElementById('discard-btn');
+    const speedWarning = document.getElementById('speed-warning');
+    const longpressIndicator = document.getElementById('longpress-indicator');
+    const longpressFill = document.getElementById('longpress-fill');
+    const pristineReplacement = document.getElementById('pristine-replacement');
+
     let width, height;
     let currentLevelIdx = 0;
-    let gameState = 'GAME'; // GAME, ALIGN, STORY, TRANSITION, END
-    
+    let gameState = 'GAME'; // GAME, ALIGN, STORY, TRANSITION, END, DISCARD_CHOICE, LONGPRESS
+
     let stitches = [];
     let stitchCount = 0;
-    
+    let scars = []; // Failed/broken stitches leave marks
+    let completedItems = []; // Visual progression
+
     // Mouse/Touch
     let mouse = { x: 0, y: 0, down: false, prevX: 0, prevY: 0 };
     let threadTrail = [];
 
     // Geometry
-    let tearPath = []; 
-    let objLeft = { x:0, y:0, w:0, h:0 }; 
-    let objRight = { x:0, y:0, w:0, h:0, isDragging: false }; 
+    let tearPath = [];
+    let objLeft = { x:0, y:0, w:0, h:0 };
+    let objRight = { x:0, y:0, w:0, h:0, isDragging: false, driftAngle: 0 };
+
+    // New Mechanic Variables
+    let stitchSpeed = 0; // For ACT II speed checking
+    let lastStitchTime = 0;
+    let discardRejected = false;
+    let longpressProgress = 0;
+    let longpressStartTime = 0;
+    let stitchPointCounts = {}; // For ACT IV multiple stitches per point 
 
     // --- Init ---
     function resize() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
         // Re-init current level to fix positions
-        if(gameState !== 'END') initLevel(currentLevelIdx);
+        if(gameState !== 'END' && gameState !== 'STORY') initLevel(currentLevelIdx);
     }
     window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(resize, 100);
+    });
 
     function initLevel(idx) {
         if (idx >= LEVELS.length) {
@@ -380,38 +586,96 @@
         uiStoryBox.style.display = 'none';
         uiStoryBox.style.opacity = 0;
 
+        // Hide all special UI elements
+        discardBtn.style.display = 'none';
+        speedWarning.style.display = 'none';
+        longpressIndicator.style.display = 'none';
+        pristineReplacement.style.display = 'none';
+
         uiAct.innerText = lvl.act;
         uiTitle.innerText = lvl.title;
         updateNarrative(lvl.narrative[0]);
-        
+
         const cx = width / 2;
         const cy = height / 2;
         tearPath = [];
-        
-        if (lvl.needsAlign) {
-            gameState = 'ALIGN';
-            uiInstruct.innerText = "DRAG THE PIECE TO ALIGN";
-            objLeft = { x: cx - 250, y: cy - 100, w: 200, h: 200 };
-            objRight = { x: cx + 250, y: cy - 100, w: 200, h: 200 };
-        } else {
-            gameState = 'GAME';
-            uiInstruct.innerText = "WEAVE BACK AND FORTH TO REPAIR";
-            
-            // Define Hitbox logic
-            if (lvl.tearType === 'vertical') {
-                tearPath = [{x: cx, y: cy - 150}, {x: cx, y: cy + 150}];
-            } else if (lvl.tearType === 'horizontal' || lvl.tearType === 'horizontal-gap') {
-                tearPath = [{x: cx - 150, y: cy}, {x: cx + 150, y: cy}];
-            } else if (lvl.tearType === 'diagonal') {
-                tearPath = [{x: cx - 80, y: cy - 150}, {x: cx + 80, y: cy + 150}];
-            } else if (lvl.tearType === 'complex') {
-                 tearPath = [{x: cx, y: cy - 100}, {x: cx, y: cy + 100}];
+        stitchPointCounts = {};
+        objRight.driftAngle = 0;
+
+        // ACT I: Show DISCARD button after initial narrative
+        if (lvl.id === 'scrap' && !discardRejected) {
+            gameState = 'DISCARD_CHOICE';
+            uiInstruct.innerText = "A CHOICE AWAITS";
+            setTimeout(() => {
+                discardBtn.style.display = 'block';
+            }, 2000);
         }
-    }
+        // ACT V: Show pristine replacement (temptation)
+        else if (lvl.id === 'armband') {
+            pristineReplacement.style.display = 'block';
+        }
+
+        if (lvl.needsAlign) {
+            if (lvl.id !== 'scrap' || discardRejected) {
+                gameState = 'ALIGN';
+                uiInstruct.innerText = "DRAG THE PIECE TO ALIGN";
+                let objW = Math.min(200, width * 0.3);
+                let objH = Math.min(200, height * 0.3);
+                objLeft = { x: cx - objW * 1.5, y: cy - objH / 2, w: objW, h: objH };
+                objRight = { x: cx + objW * 0.5, y: cy - objH / 2, w: objW, h: objH, isDragging: false, driftAngle: 0 };
+            }
+        } else {
+            if (lvl.id === 'scrap' && !discardRejected) {
+                // Don't set up game yet, waiting for discard choice
+            } else {
+                gameState = 'GAME';
+
+                // ACT-specific instructions
+                if (lvl.id === 'uniform') {
+                    uiInstruct.innerText = "STITCH SLOWLY AND CAREFULLY";
+                } else if (lvl.id === 'collar') {
+                    uiInstruct.innerText = "ACCEPT THE IMPERFECTION";
+                } else if (lvl.id === 'holster') {
+                    uiInstruct.innerText = "REINFORCE EACH POINT";
+                } else {
+                    uiInstruct.innerText = "WEAVE BACK AND FORTH TO REPAIR";
+                }
+
+                // Define Hitbox logic
+                if (lvl.tearType === 'vertical') {
+                    tearPath = [{x: cx, y: cy - 150}, {x: cx, y: cy + 150}];
+                } else if (lvl.tearType === 'horizontal' || lvl.tearType === 'horizontal-gap') {
+                    tearPath = [{x: cx - 150, y: cy}, {x: cx + 150, y: cy}];
+                } else if (lvl.tearType === 'diagonal') {
+                    tearPath = [{x: cx - 80, y: cy - 150}, {x: cx + 80, y: cy + 150}];
+                } else if (lvl.tearType === 'complex') {
+                    tearPath = [{x: cx, y: cy - 100}, {x: cx, y: cy + 100}];
+                }
+            }
+        }
     }
 
     // --- Input Handling ---
-    
+
+    // Discard Button Handler (ACT I)
+    discardBtn.addEventListener('click', () => {
+        if (gameState === 'DISCARD_CHOICE') {
+            // Reject discard, choose to repair
+            discardRejected = true;
+            discardBtn.classList.add('rejected');
+            updateNarrative("No. I choose to try.");
+            setTimeout(() => {
+                discardBtn.style.display = 'none';
+                gameState = 'GAME';
+                const lvl = LEVELS[currentLevelIdx];
+                uiInstruct.innerText = "WEAVE BACK AND FORTH TO REPAIR";
+                const cx = width / 2;
+                const cy = height / 2;
+                tearPath = [{x: cx, y: cy - 150}, {x: cx, y: cy + 150}];
+            }, 1000);
+        }
+    });
+
     // Global click handler for Story Mode
     window.addEventListener('click', () => {
         if (gameState === 'STORY') {
@@ -424,49 +688,81 @@
         }
     });
 
-    ['mousedown', 'touchstart'].forEach(evt => 
+    ['mousedown', 'touchstart'].forEach(evt =>
         window.addEventListener(evt, e => {
-            if (gameState === 'STORY') return; // Handled by click above
-            
+            if (e.type === 'touchstart') e.preventDefault();
+            if (gameState === 'STORY' || gameState === 'DISCARD_CHOICE') return;
+
             mouse.down = true;
             updateMouse(e);
-            
+
             if (gameState === 'ALIGN') {
                 if (mouse.x > objRight.x && mouse.x < objRight.x + objRight.w &&
                     mouse.y > objRight.y && mouse.y < objRight.y + objRight.h) {
                     objRight.isDragging = true;
                 }
             }
+
+            // ACT V: Check if final stitches complete, start long-press
+            const lvl = LEVELS[currentLevelIdx];
+            if (lvl && lvl.id === 'armband' && gameState === 'GAME' && stitchCount >= lvl.requiredStitches - 1) {
+                gameState = 'LONGPRESS';
+                longpressStartTime = Date.now();
+                longpressProgress = 0;
+                longpressIndicator.style.display = 'block';
+            }
         })
     );
 
-    ['mousemove', 'touchmove'].forEach(evt => 
+    ['mousemove', 'touchmove'].forEach(evt =>
         window.addEventListener(evt, e => {
-            if (gameState === 'STORY') return;
-            
+            if (e.type === 'touchmove') e.preventDefault();
+            if (gameState === 'STORY' || gameState === 'DISCARD_CHOICE') return;
+
             updateMouse(e);
-            
+
             if (gameState === 'ALIGN' && objRight.isDragging) {
                 objRight.x = mouse.x - objRight.w/2;
-                const targetX = objLeft.x + objLeft.w; 
+                const targetX = objLeft.x + objLeft.w;
                 if (Math.abs(objRight.x - targetX) < 30) {
                     objRight.x = targetX;
                     objRight.isDragging = false;
                     completeAlign();
                 }
             }
-            
+
             if (gameState === 'GAME' && mouse.down) {
                 handleSewing();
+            }
+
+            // ACT V: Long-press progress tracking
+            if (gameState === 'LONGPRESS' && mouse.down) {
+                const elapsed = Date.now() - longpressStartTime;
+                longpressProgress = Math.min(elapsed / 3000, 1); // 3 second hold
+                longpressFill.style.width = (longpressProgress * 100) + '%';
+
+                if (longpressProgress >= 1) {
+                    // Complete!
+                    longpressIndicator.style.display = 'none';
+                    levelComplete();
+                }
             }
         })
     );
 
-    ['mouseup', 'touchend'].forEach(evt => 
+    ['mouseup', 'touchend'].forEach(evt =>
         window.addEventListener(evt, e => {
+            if (e.type === 'touchend') e.preventDefault();
             mouse.down = false;
             objRight.isDragging = false;
             threadTrail = [];
+
+            // Reset long-press if released early
+            if (gameState === 'LONGPRESS') {
+                gameState = 'GAME';
+                longpressIndicator.style.display = 'none';
+                longpressFill.style.width = '0%';
+            }
         })
     );
 
@@ -499,10 +795,42 @@
         threadTrail.push({x: mouse.x, y: mouse.y});
         if (threadTrail.length > 20) threadTrail.shift();
         if (tearPath.length < 2) return;
-        
+
+        const lvl = LEVELS[currentLevelIdx];
         const p1 = tearPath[0];
         const p2 = tearPath[1];
+
         if (intersects(mouse.prevX, mouse.prevY, mouse.x, mouse.y, p1.x, p1.y, p2.x, p2.y)) {
+            // ACT II: Check speed - if too fast, thread snaps
+            if (lvl && lvl.id === 'uniform') {
+                const currentTime = Date.now();
+                const timeSinceLastStitch = currentTime - lastStitchTime;
+                const stitchSpeed = Math.hypot(mouse.x - mouse.prevX, mouse.y - mouse.prevY);
+
+                if (stitchSpeed > 15 && timeSinceLastStitch < 200) {
+                    // Too fast! Thread snaps
+                    speedWarning.style.opacity = '1';
+                    setTimeout(() => {
+                        speedWarning.style.opacity = '0';
+                    }, 500);
+
+                    // Create a scar instead of a stitch
+                    scars.push({
+                        x: mouse.x,
+                        y: mouse.y,
+                        alpha: 0.3
+                    });
+
+                    // Remove recent stitches (thread broke)
+                    if (stitches.length > 0) {
+                        stitches.pop();
+                        stitchCount = Math.max(0, stitchCount - 1);
+                    }
+                    return;
+                }
+                lastStitchTime = currentTime;
+            }
+
             addStitch(mouse.x, mouse.y);
         }
     }
@@ -517,22 +845,62 @@
     }
 
     function addStitch(x, y) {
+        const lvl = LEVELS[currentLevelIdx];
+
         if (stitches.length > 0) {
             const last = stitches[stitches.length - 1];
-            if (Math.hypot(last.bx - x, last.by - y) < 8) return; 
+            if (Math.hypot(last.bx - x, last.by - y) < 8) return;
+        }
+
+        // ACT IV: Check if this point needs multiple stitches
+        if (lvl && lvl.id === 'holster') {
+            const pointKey = Math.floor(y / 30); // Group by vertical sections
+            if (!stitchPointCounts[pointKey]) {
+                stitchPointCounts[pointKey] = 0;
+            }
+            stitchPointCounts[pointKey]++;
+
+            // Require 3 stitches through each section
+            const stitchesNeeded = 3;
+            if (stitchPointCounts[pointKey] < stitchesNeeded) {
+                // Visual feedback: thicker thread as you reinforce
+                const reinforceLevel = stitchPointCounts[pointKey];
+                // Don't increment main counter yet
+            } else if (stitchPointCounts[pointKey] === stitchesNeeded) {
+                // This completes the reinforcement
+                stitchCount++;
+            } else {
+                return; // Already fully reinforced
+            }
+        } else {
+            stitchCount++;
         }
 
         const side = (x < width/2) ? -1 : 1;
-        const startX = x - (side * (15 + Math.random() * 15));
-        const startY = y + (Math.random() * 10 - 5);
+        let startX = x - (side * (15 + Math.random() * 15));
+        let startY = y + (Math.random() * 10 - 5);
+
+        // ACT III: Deliberately imperfect stitches - add curves/wobbles
+        let curvePoints = null;
+        if (lvl && lvl.id === 'collar') {
+            // Create curved/wobbly stitch instead of straight line
+            const midX = (startX + x) / 2;
+            const midY = (startY + y) / 2;
+            const wobbleX = midX + (Math.random() - 0.5) * 20;
+            const wobbleY = midY + (Math.random() - 0.5) * 20;
+            curvePoints = {cx: wobbleX, cy: wobbleY};
+        }
 
         stitches.push({
-            ax: startX, ay: startY,
-            bx: x, by: y,
-            alpha: 0
+            ax: startX,
+            ay: startY,
+            bx: x,
+            by: y,
+            curve: curvePoints, // ACT III imperfection
+            alpha: 0,
+            pointKey: lvl && lvl.id === 'holster' ? Math.floor(y / 30) : null
         });
 
-        stitchCount++;
         checkProgress();
     }
 
@@ -563,6 +931,17 @@
     function levelComplete() {
         gameState = 'TRANSITION';
         uiInstruct.innerText = "COMPLETE";
+
+        // Save completed item for visual progression
+        const lvl = LEVELS[currentLevelIdx];
+        if (lvl && lvl.type === 'GAME') {
+            completedItems.push({
+                id: lvl.id,
+                stitches: [...stitches],
+                scars: [...scars]
+            });
+        }
+
         setTimeout(() => {
             currentLevelIdx++;
             initLevel(currentLevelIdx);
@@ -587,14 +966,86 @@
         const lvl = LEVELS[currentLevelIdx];
         if (!lvl) return;
 
+        // ACT V: Apply drift to right piece
+        if (lvl && lvl.id === 'armband' && gameState === 'GAME') {
+            objRight.driftAngle += 0.02;
+            const driftX = Math.sin(objRight.driftAngle) * 3;
+            const driftY = Math.cos(objRight.driftAngle * 1.3) * 2;
+            objRight.x = width / 2 + objLeft.w + driftX;
+            objRight.y = height / 2 - objRight.h / 2 + driftY;
+        }
+
+        // Draw completed items in background (visual progression)
+        drawCompletedItems();
+
         drawObject(lvl);
         drawTear(lvl);
+        drawScars();
         drawStitches(lvl);
-        
-        if (gameState === 'GAME' || gameState === 'ALIGN') {
+
+        if (gameState === 'GAME' || gameState === 'ALIGN' || gameState === 'LONGPRESS') {
             drawCursor(lvl);
         }
+
+        // Show speed warning display status
+        if (speedWarning.style.opacity === '1') {
+            speedWarning.style.display = 'block';
+        } else if (speedWarning.style.opacity === '0') {
+            setTimeout(() => {
+                if (speedWarning.style.opacity === '0') speedWarning.style.display = 'none';
+            }, 200);
+        }
+
         requestAnimationFrame(draw);
+    }
+
+    function drawCompletedItems() {
+        if (completedItems.length === 0) return;
+
+        ctx.save();
+        ctx.globalAlpha = 0.15; // Faint background
+
+        const spacing = Math.min(100, width / (completedItems.length + 2));
+        completedItems.forEach((item, idx) => {
+            ctx.save();
+            const x = spacing * (idx + 1);
+            const y = height * 0.15;
+            const scale = 0.3;
+
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+
+            // Draw mini version of completed item
+            ctx.fillStyle = '#666';
+            ctx.fillRect(-30, -40, 60, 80);
+
+            // Draw its stitches
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 2;
+            if (item.stitches) {
+                item.stitches.forEach(s => {
+                    ctx.beginPath();
+                    ctx.moveTo(s.ax - width / 2 + 30, s.ay - height / 2);
+                    ctx.lineTo(s.bx - width / 2 + 30, s.by - height / 2);
+                    ctx.stroke();
+                });
+            }
+
+            ctx.restore();
+        });
+
+        ctx.restore();
+    }
+
+    function drawScars() {
+        if (scars.length === 0) return;
+
+        scars.forEach(scar => {
+            ctx.fillStyle = `rgba(150, 50, 50, ${scar.alpha})`;
+            ctx.beginPath();
+            ctx.arc(scar.x, scar.y, 6, 0, Math.PI * 2);
+            ctx.fill();
+        });
     }
 
     function drawObject(lvl) {
@@ -683,14 +1134,43 @@
         ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.beginPath();
+
         stitches.forEach(s => {
             if (s.alpha < 1) s.alpha += 0.05;
             ctx.globalAlpha = s.alpha;
+
+            ctx.beginPath();
             ctx.moveTo(s.ax, s.ay);
-            ctx.lineTo(s.bx, s.by);
+
+            // ACT III: Draw curved/wobbly stitches
+            if (s.curve) {
+                ctx.quadraticCurveTo(s.curve.cx, s.curve.cy, s.bx, s.by);
+            } else {
+                ctx.lineTo(s.bx, s.by);
+            }
+
+            ctx.stroke();
+
+            // ACT IV: Visual reinforcement indicator
+            if (s.pointKey !== null && stitchPointCounts[s.pointKey]) {
+                const count = stitchPointCounts[s.pointKey];
+                if (count >= 2) {
+                    // Draw thicker line for reinforced stitches
+                    ctx.lineWidth = 3.5 + (count * 0.5);
+                    ctx.globalAlpha = s.alpha * 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(s.ax, s.ay);
+                    if (s.curve) {
+                        ctx.quadraticCurveTo(s.curve.cx, s.curve.cy, s.bx, s.by);
+                    } else {
+                        ctx.lineTo(s.bx, s.by);
+                    }
+                    ctx.stroke();
+                    ctx.lineWidth = 2.5;
+                }
+            }
         });
-        ctx.stroke();
+
         ctx.globalAlpha = 1;
     }
 
@@ -714,6 +1194,9 @@
         ctx.beginPath(); ctx.arc(40, 0, 1.5, 0, Math.PI*2); ctx.fill();
         ctx.restore();
     }
+
+    // Initialize speed warning as hidden
+    speedWarning.style.display = 'none';
 
     resize();
     draw();
