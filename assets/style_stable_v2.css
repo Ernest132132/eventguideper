@@ -1,0 +1,482 @@
+/*
+|--------------------------------------------------------------------------
+| FINAL STYLE.CSS: THE VELVET ROOM PORTAL (Advanced Immersion)
+|--------------------------------------------------------------------------
+| Merged styles for Login, Dashboard, ID Card, and Info Pages with advanced
+| Velvet Room aesthetics, focusing on mobile immersion and dynamic colors.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap');
+/* Font Awesome for Icons */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
+
+/* --- Variable Definitions (Updated Palette) --- */
+:root {
+    --velvet-dark-blue: #0A0D1F; /* Very deep, almost black blue for base */
+    --velvet-medium-blue: #1A2140; /* Slightly lighter for elements */
+    --velvet-accent-blue: #2A3258; /* For subtle highlights */
+    --velvet-gold: #D4AF37;     /* Primary Gold */
+    --velvet-gold-light: #FFD700; /* Lighter gold for highlights/glow */
+    --velvet-silver: #C0C0C0;   /* For subtle metallic accents */
+    --velvet-red: #E60012;      /* Persona Red for alerts/important info */
+    --velvet-green: #00D26A;    /* For success states */
+    --velvet-light-text: #E0E0E0; /* General text color */
+    --velvet-dark-text: #050610; /* For text on gold backgrounds */
+}
+
+/* --- Animation Keyframes --- */
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes subtleGoldPulse {
+    0% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.5); }
+    100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+}
+
+@keyframes ambientPan {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+
+/* --- Base & Global Styles --- */
+body {
+    background-color: var(--velvet-dark-blue);
+    color: var(--velvet-light-text);
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    overflow-x: hidden;
+
+    /* COMPLEX BACKGROUND LAYERS for depth: radial gradient + subtle lines + moving layer */
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+        radial-gradient(circle at center, rgba(42, 50, 88, 0.4) 0%, transparent 70%),
+        var(--velvet-dark-blue);
+
+    background-size: 50px 50px, 50px 50px, cover, cover;
+    background-position: 0% 0%, 0% 0%, center center, center center;
+    
+    animation: ambientPan 120s linear infinite; 
+}
+
+h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--velvet-gold-light);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px rgba(255,215,0,0.3);
+}
+
+p, label, span, div.info-desc {
+    color: var(--velvet-light-text);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    color: var(--velvet-silver);
+    font-size: 0.85rem;
+    letter-spacing: 0.8px;
+}
+
+.container {
+    width: 95%;
+    max-width: 450px;
+    padding: 20px 15px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 10;
+    animation: fadeInSlideUp 0.8s ease-out both; 
+}
+
+
+/* --- Card and Form Elements --- */
+.card {
+    border: 2px solid var(--velvet-gold);
+    background: var(--velvet-medium-blue);
+    border-radius: 8px; 
+    padding: 30px 20px;
+    position: relative;
+    overflow: hidden;
+    
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+
+    /* Base pulse for all cards */
+    animation: subtleGoldPulse 3s infinite ease-in-out; 
+}
+
+/* Inputs */
+input[type="text"], 
+input[type="number"],
+textarea,
+select {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--velvet-gold);
+    border-bottom: 2px solid var(--velvet-gold-light);
+    color: var(--velvet-light-text);
+    font-size: 1.1rem;
+    padding: 10px;
+    width: calc(100% - 22px);
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 15px;
+    outline: none;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+input[type="text"]:focus, 
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    box-shadow: 0 0 10px var(--velvet-gold);
+    border-color: var(--velvet-gold-light);
+}
+
+
+/* Buttons */
+.btn-gold {
+    background: var(--velvet-gold);
+    color: var(--velvet-dark-text);
+    border: none;
+    padding: 14px 35px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-family: 'Cinzel', serif;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.btn-gold:hover {
+    background: var(--velvet-gold-light);
+    box-shadow: 0 0 15px var(--velvet-gold-light);
+    transform: translateY(-2px);
+}
+
+.alert {
+    background: rgba(230, 0, 18, 0.3);
+    border: 1px solid var(--velvet-red);
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    color: var(--velvet-light-text);
+}
+
+
+/* --- Dashboard Styles --- */
+.profile-header {
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--velvet-accent-blue);
+    padding-bottom: 20px;
+    width: 100%;
+    position: relative;
+}
+/* Gold line accent under profile header */
+.profile-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--velvet-gold-light);
+    box-shadow: 0 0 8px var(--velvet-gold-light);
+}
+
+
+.app-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.app-btn {
+    background: var(--velvet-accent-blue);
+    border: 1px solid var(--velvet-gold);
+    color: var(--velvet-gold-light);
+    padding: 15px; 
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100px; 
+    box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+}
+
+.app-btn:hover {
+    background: var(--velvet-gold);
+    color: var(--velvet-dark-text);
+    transform: scale(1.08);
+    box-shadow: 0 0 20px var(--velvet-gold-light);
+}
+
+.app-btn i {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    text-shadow: 0 0 5px rgba(255,215,0,0.5);
+}
+
+.app-btn span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+}
+
+/* Rescue Code Modal (The "Save This" Box) */
+.rescue-box {
+    background: var(--velvet-medium-blue);
+    color: var(--velvet-light-text);
+    border: 3px solid var(--velvet-gold-light);
+    padding: 25px 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInSlideUp 1s ease-out both, subtleGoldPulse 4s infinite ease-in-out 1s;
+    text-align: left;
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+}
+.rescue-box h2 {
+    color: var(--velvet-red);
+    text-shadow: 0 0 8px rgba(230,0,18,0.5);
+    margin-top: 0;
+}
+.rescue-code {
+    font-size: 2.8rem;
+    font-weight: bold;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 6px;
+    color: var(--velvet-red);
+    display: block;
+    margin: 15px 0;
+    text-shadow: 0 0 10px rgba(230,0,18,0.7);
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+.rescue-box p {
+    font-size: 0.85rem;
+    color: var(--velvet-silver);
+}
+
+
+/* --- ID Card Specifics --- */
+.qr-frame {
+    background: var(--velvet-light-text);
+    padding: 15px;
+    border: 4px solid var(--velvet-gold-light);
+    display: inline-block;
+    margin: 20px 0;
+    box-shadow: 0 0 15px rgba(255,215,0,0.7);
+    border-radius: 8px;
+}
+.qr-frame img {
+    display: block;
+}
+
+.status-badge {
+    padding: 10px 20px;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 1px solid white;
+    margin-top: 15px;
+    display: inline-block;
+    border-radius: 4px;
+    letter-spacing: 1.5px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.status-active { 
+    background: rgba(0,0,0,0.5); 
+    color: var(--velvet-light-text); 
+    border-color: var(--velvet-silver); 
+}
+.status-eligible { 
+    background: var(--velvet-green); 
+    color: var(--velvet-dark-text); 
+    border-color: var(--velvet-green); 
+    box-shadow: 0 0 15px var(--velvet-green); 
+} 
+.status-redeemed { 
+    background: var(--velvet-red); 
+    color: var(--velvet-light-text); 
+    border-color: var(--velvet-red); 
+    text-decoration: line-through;
+    box-shadow: 0 0 10px rgba(230,0,18,0.7);
+}
+
+/* --- Info List Styles (Vendors/Confidants) --- */
+.info-card {
+    background: var(--velvet-medium-blue);
+    border: 1px solid var(--velvet-accent-blue);
+    padding: 18px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    text-align: left;
+    position: relative;
+    transition: all 0.25s ease-out;
+    display: flex;
+    align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.info-card:hover {
+    background: var(--velvet-accent-blue);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0;
+    margin-bottom: 5px;
+}
+
+.info-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: var(--velvet-gold-light);
+    margin: 0;
+    text-shadow: 0 0 3px rgba(255,215,0,0.2);
+}
+
+.info-meta {
+    font-size: 0.8rem;
+    color: var(--velvet-silver);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.info-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--velvet-light-text);
+    margin-top: 10px;
+}
+
+.insta-link {
+    color: #E1306C;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: 0.2s;
+    margin-top: 5px;
+    display: inline-block;
+}
+.insta-link:hover { color: var(--velvet-light-text); }
+
+
+/* --- Circular Image Styles --- */
+.list-image-circle {
+    height: 70px;
+    width: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--velvet-gold-light);
+    margin-right: 18px;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+.list-icon-circle {
+    height: 45px;
+    width: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--velvet-gold);
+    margin-right: 15px;
+    flex-shrink: 0;
+    box-shadow: 0 0 5px rgba(255,215,0,0.4);
+}
+
+/* Admin List Image Preview (specific to admin pages) */
+.admin-list-img {
+    height: 40px; 
+    width: 40px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 1px solid gold; 
+    margin-right: 10px;
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 380px) {
+    .container {
+        width: 98%;
+        padding: 15px 10px;
+    }
+    h1 { font-size: 2rem; }
+    .app-btn i { font-size: 2rem; }
+    .app-btn span { font-size: 0.8rem; letter-spacing: 1px; }
+    .rescue-code { font-size: 2.2rem; letter-spacing: 4px; }
+}
+
+/* --- Cognitions (Game Blurb) Styles --- */
+.game-card {
+    background: var(--velvet-medium-blue);
+    border: 1px solid var(--velvet-gold);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 25px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-card img {
+    width: 100%; /* Make the image fill the card width */
+    max-width: 180px; /* Maximize the size of the 3:4 image */
+    height: auto;
+    margin-bottom: 15px;
+    border: 3px solid var(--velvet-gold-light);
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    transition: transform 0.3s;
+}
+.game-card:hover img {
+    transform: scale(1.03);
+}
+
+.game-blurb h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.5rem;
+}
+.game-blurb p {
+    font-size: 0.9rem;
+    color: var(--velvet-silver);
+}
