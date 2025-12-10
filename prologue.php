@@ -148,6 +148,15 @@
             opacity: 0.5;
         }
 
+        /* Skip button styling */
+        .skip-button:hover {
+            background: #fff !important;
+            transform: scale(1.05);
+        }
+        .skip-button:active {
+            transform: scale(0.95);
+        }
+
         /* --- WARNING OVERLAY (RESPONSIVE FIXES) --- */
         #warning-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -399,7 +408,7 @@
             </div>
     </div>
 
-    <button id="persistent-skip-btn" class="choice-button" style="position:fixed; bottom:80px; right:20px; z-index:200; width:auto; padding:8px 15px; font-size:0.8rem; display:none; background: var(--velvet-gold); color: #000; font-weight: bold; box-shadow: 0 0 15px rgba(0,0,0,0.5); margin-bottom: env(safe-area-inset-bottom);">
+    <button id="persistent-skip-btn" class="skip-button" style="position:fixed; bottom:80px; right:20px; z-index:200; width:auto; padding:8px 15px; font-size:0.8rem; display:none; background: var(--velvet-gold); color: #000; font-weight: bold; box-shadow: 0 0 15px rgba(0,0,0,0.5); margin-bottom: env(safe-area-inset-bottom); border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; font-family: 'Crimson Text', serif; transition: all 0.3s ease;">
         SKIP PROLOGUE <i class="fa-solid fa-forward"></i>
     </button>
 
