@@ -398,17 +398,6 @@
 
     <script>
         // ==========================================
-        // 0. CACHE BUSTING
-        // ==========================================
-        // Force reload from server on every page load
-        if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
-            // First load - add timestamp to prevent caching
-            if (!window.location.search.includes('t=')) {
-                window.location.href = window.location.pathname + '?t=' + new Date().getTime();
-            }
-        }
-
-        // ==========================================
         // 1. STORY & CONFIGURATION
         // ==========================================
         let gameState = "STORY";
