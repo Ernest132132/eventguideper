@@ -96,6 +96,11 @@
             opacity: 0;
             transform: translateY(15px);
             animation: fadeInUp 0.6s ease 0.8s forwards;
+            pointer-events: none; /* Disable clicks until animation completes */
+        }
+
+        .choices-container.clickable {
+            pointer-events: auto; /* Enable clicks after animation */
         }
 
         /* Unified Button Style for Choices and Continue */
@@ -747,7 +752,7 @@
                     html += '</div>';
                 } else if (scene.type === 'narrative') {
                     // CONTINUE BUTTON
-                    html += `<button class="choice-button" id="continue-btn" style="margin-top:2rem; opacity:0; animation:fadeInUp 0.6s ease 1s forwards">Continue</button>`;
+                    html += `<button class="choice-button" id="continue-btn" style="margin-top:2rem; opacity:0; animation:fadeInUp 0.6s ease 1s forwards; pointer-events:none;">Continue</button>`;
                 }
 
                 this.elements.content.innerHTML = html;
@@ -758,8 +763,20 @@
                     document.querySelectorAll('.choice-button').forEach(btn => {
                         btn.addEventListener('click', (e) => this.handleChoice(e, scene));
                     });
+
+                    // Enable clicks after animation completes (0.8s delay + 0.6s duration = 1.4s)
+                    setTimeout(() => {
+                        const container = document.querySelector('.choices-container');
+                        if (container) container.classList.add('clickable');
+                    }, 1400);
                 } else if (scene.type === 'narrative') {
                     document.getElementById('continue-btn').addEventListener('click', () => this.nextScene());
+
+                    // Enable clicks after continue button animation completes (1s delay + 0.6s duration = 1.6s)
+                    setTimeout(() => {
+                        const btn = document.getElementById('continue-btn');
+                        if (btn) btn.style.pointerEvents = 'auto';
+                    }, 1600);
                 }
             },
 
@@ -797,9 +814,17 @@
                     html += `<p class="story-text" style="color:var(--velvet-gold); border-left:2px solid var(--velvet-gold); padding-left:10px;">${outcome}</p>`;
                     if(followUp) html += `<p class="story-text">${followUp}</p>`;
 
-                    html += `<button class="choice-button" id="continue-btn" style="margin-top:2rem;">Continue</button>`;
+                    html += `<button class="choice-button" id="continue-btn" style="margin-top:2rem; pointer-events:none;">Continue</button>`;
                     this.elements.content.innerHTML = html;
-                    document.getElementById('continue-btn').addEventListener('click', () => this.nextScene());
+
+                    const continueBtn = document.getElementById('continue-btn');
+                    continueBtn.addEventListener('click', () => this.nextScene());
+
+                    // Enable continue button after a brief delay (500ms to let text appear)
+                    setTimeout(() => {
+                        continueBtn.style.pointerEvents = 'auto';
+                    }, 500);
+
                     this._choiceLocked = false;
                 }
             },
