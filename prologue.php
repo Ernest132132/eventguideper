@@ -764,6 +764,7 @@
             },
 
             nextScene: function() {
+                this._choiceLocked = false; // Unlock for next choice
                 this.elements.content.style.opacity = 0;
                 setTimeout(() => {
                     this.renderScene(StoryEngine.currentScene + 1);
@@ -772,23 +773,34 @@
             },
 
             handleChoice: function(e, scene) {
+                // Prevent multiple rapid clicks
+                if (this._choiceLocked) return;
+                this._choiceLocked = true;
+
                 const type = e.target.dataset.type;
                 StoryEngine.choices[type]++;
+
+                // Disable all buttons immediately
+                document.querySelectorAll('.choice-button').forEach(btn => {
+                    btn.classList.add('disabled');
+                    btn.style.pointerEvents = 'none';
+                });
 
                 if (scene.isGlitchTrigger) {
                     this.triggerGlitchSequence();
                 } else {
                     const outcome = scene.outcomes[type];
                     const followUp = scene.followUp;
-                    
+
                     let html = this.elements.content.innerHTML;
                     html = html.replace(/<div class="choices-container">[\s\S]*<\/div>/, '');
                     html += `<p class="story-text" style="color:var(--velvet-gold); border-left:2px solid var(--velvet-gold); padding-left:10px;">${outcome}</p>`;
                     if(followUp) html += `<p class="story-text">${followUp}</p>`;
-                    
+
                     html += `<button class="choice-button" id="continue-btn" style="margin-top:2rem;">Continue</button>`;
                     this.elements.content.innerHTML = html;
                     document.getElementById('continue-btn').addEventListener('click', () => this.nextScene());
+                    this._choiceLocked = false;
                 }
             },
 
@@ -954,29 +966,29 @@
 
                 this.elements.content.innerHTML = `
                     <div class="final-screen" style="min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                        <div class="location" style="opacity: 0; animation: fadeInUp 0.6s ease 0.5s forwards;">SAN GABRIEL, CA</div>
+                        <div class="location" style="opacity: 0; animation: fadeInUp 0.6s ease 0.5s forwards; margin-bottom: 0.5rem;">SAN GABRIEL, CA</div>
 
-                        <div class="venue" style="opacity: 0; animation: fadeInUp 0.6s ease 0.7s forwards;">
+                        <div class="venue" style="opacity: 0; animation: fadeInUp 0.6s ease 0.7s forwards; margin-bottom: 1rem;">
                             Factory Tea Bar<br>
                             <span style="font-size: 1rem; color: #aaa;">${dateString}</span>
                         </div>
-                        <div class="scene-break" style="opacity: 0; animation: fadeInUp 0.6s ease 0.9s forwards;">◈</div>
-                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.1s forwards;">
+                        <div class="scene-break" style="opacity: 0; animation: fadeInUp 0.6s ease 0.9s forwards; margin-bottom: 1rem;">◈</div>
+                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.1s forwards; margin-bottom: 0.75rem;">
                             You're no longer THEM.
                         </p>
-                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.4s forwards;">
+                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.4s forwards; margin-bottom: 0.75rem;">
                             You're back to yourself—standing outside, ticket in hand.
                         </p>
-                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.7s forwards;">
+                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.7s forwards; margin-bottom: 0.75rem;">
                             The festival awaits. The music is playing.
                         </p>
-                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 2s forwards;">
+                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 2s forwards; margin-bottom: 0.75rem;">
                             And somewhere inside—
                         </p>
-                        <p class="waiting" style="text-align: center; margin-top: 2rem; opacity: 0; animation: fadeInUp 0.6s ease 2.5s forwards; color: var(--velvet-gold); font-size: 1.3rem;">
+                        <p class="waiting" style="text-align: center; margin-top: 0.5rem; opacity: 0; animation: fadeInUp 0.6s ease 2.5s forwards; color: var(--velvet-gold); font-size: 1.3rem;">
                             THEY'RE waiting for you.
                         </p>
-                        <br><br>
+                        <br>
                         <a href="contract.php?done=1" class="btn-enter">
                             ENTER THE VELVET ROOM
                         </a>
