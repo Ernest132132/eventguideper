@@ -1,22 +1,5 @@
 <?php
-session_start();
-require 'db.php';
-
-// 1. Security: Must be logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
-}
-
-// 2. Logic: If they are already active, bounce them to home
-$stmt = $pdo->prepare("SELECT status FROM operatives WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$status = $stmt->fetchColumn();
-
-if ($status !== 'pending') {
-    header("Location: home.php");
-    exit();
-}
+// Access gate removed - anyone can view prologue
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -894,7 +877,12 @@ if ($status !== 'pending') {
             },
 
             renderTypedSequence: function() {
+                // Prevent multiple calls
+                if (this._typingInProgress) return;
+                this._typingInProgress = true;
+
                 this.elements.skipBtn.style.display = 'none';
+                this.elements.content.style.opacity = 1; // Ensure visible
                 this.elements.content.innerHTML = `
                     <div style="min-height: 80vh; display: flex; flex-direction: column; justify-content: center; text-align: center; color: white;">
                         <div class="typed-container" id="typed-1"></div>
@@ -902,25 +890,26 @@ if ($status !== 'pending') {
                         <div class="typed-container" id="typed-3" style="margin-top: 3rem; color: var(--velvet-silver); font-size: 0.9rem;"></div>
                     </div>
                 `;
-                
+
                 // Remove black screen to reveal the black viewport with text
                 this.elements.blackScreen.classList.remove('active');
 
                 const ending = StoryEngine.getEndingText();
-                
+
                 setTimeout(() => {
-                    this.typeText('typed-1', "If people won't see me... then I'll make a world where they’ll have no choice.", 50, () => {
+                    this.typeText('typed-1', "If people won't see me... then I'll make a world where they'll have no choice.", 50, () => {
                         setTimeout(() => {
                             this.typeText('typed-2', ending, 30, () => {
                                 setTimeout(() => {
                                     this.typeText('typed-3', "You know this isn't right. But you're so tired of being invisible.", 40, () => {
                                         setTimeout(() => {
+                                            this._typingInProgress = false;
                                             this.renderFinalScreen();
-                                        }, 2000);
+                                        }, 3000);
                                     });
-                                }, 1000);
+                                }, 2000);
                             });
-                        }, 1500);
+                        }, 2000);
                     });
                 }, 1000);
             },
@@ -945,53 +934,65 @@ if ($status !== 'pending') {
             },
 
             renderFinalScreen: function() {
-                track('FINISHED');
-                
-                // --- NEW DATE FORMATTER LOGIC ---
-                const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-                const d = new Date();
-                let month = months[d.getMonth()];
-                let day = d.getDate();
-                let hour = d.getHours();
-                let min = d.getMinutes();
-                let ampm = hour >= 12 ? 'PM' : 'AM';
-                hour = hour % 12;
-                hour = hour ? hour : 12; 
-                min = min < 10 ? '0'+min : min;
-                const dateString = month + ' ' + day + ', ' + hour + ':' + min + ' ' + ampm;
-                // --------------------------------
+                // Prevent multiple calls
+                if (this._finalScreenRendered) return;
+                this._finalScreenRendered = true;
 
-                this.elements.content.innerHTML = `
-                    <div class="final-screen" style="min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                        <div class="location" style="opacity: 0; animation: fadeInUp 0.6s ease 0.5s forwards;">SAN GABRIEL, CA</div>
-                        
-                        <div class="venue" style="opacity: 0; animation: fadeInUp 0.6s ease 0.7s forwards;">
-                            Factory Tea Bar<br>
-                            <span style="font-size: 1rem; color: #aaa;">${dateString}</span>
+                track('FINISHED');
+
+                // Fade out current content smoothly
+                this.elements.content.style.opacity = 0;
+
+                setTimeout(() => {
+                    // --- NEW DATE FORMATTER LOGIC ---
+                    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+                    const d = new Date();
+                    let month = months[d.getMonth()];
+                    let day = d.getDate();
+                    let hour = d.getHours();
+                    let min = d.getMinutes();
+                    let ampm = hour >= 12 ? 'PM' : 'AM';
+                    hour = hour % 12;
+                    hour = hour ? hour : 12;
+                    min = min < 10 ? '0'+min : min;
+                    const dateString = month + ' ' + day + ', ' + hour + ':' + min + ' ' + ampm;
+                    // --------------------------------
+
+                    this.elements.content.innerHTML = `
+                        <div class="final-screen" style="min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                            <div class="location" style="opacity: 0; animation: fadeInUp 0.6s ease 0.5s forwards;">SAN GABRIEL, CA</div>
+
+                            <div class="venue" style="opacity: 0; animation: fadeInUp 0.6s ease 0.7s forwards;">
+                                Factory Tea Bar<br>
+                                <span style="font-size: 1rem; color: #aaa;">${dateString}</span>
+                            </div>
+                            <div class="scene-break" style="opacity: 0; animation: fadeInUp 0.6s ease 0.9s forwards;">◈</div>
+                            <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.1s forwards;">
+                                You're no longer THEM.
+                            </p>
+                            <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.4s forwards;">
+                                You're back to yourself—standing outside, ticket in hand.
+                            </p>
+                            <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.7s forwards;">
+                                The festival awaits. The music is playing.
+                            </p>
+                            <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 2s forwards;">
+                                And somewhere inside—
+                            </p>
+                            <p class="waiting" style="text-align: center; margin-top: 2rem; opacity: 0; animation: fadeInUp 0.6s ease 2.5s forwards; color: var(--velvet-gold); font-size: 1.3rem;">
+                                THEY'RE waiting for you.
+                            </p>
+                            <br><br>
+                            <a href="contract.php?done=1" class="btn-enter">
+                                ENTER THE VELVET ROOM
+                            </a>
                         </div>
-                        <div class="scene-break" style="opacity: 0; animation: fadeInUp 0.6s ease 0.9s forwards;">◈</div>
-                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.1s forwards;">
-                            You're no longer THEM.
-                        </p>
-                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.4s forwards;">
-                            You're back to yourself—standing outside, ticket in hand.
-                        </p>
-                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 1.7s forwards;">
-                            The festival awaits. The music is playing.
-                        </p>
-                        <p class="story-text" style="text-align: center; opacity: 0; animation: fadeInUp 0.6s ease 2s forwards;">
-                            And somewhere inside—
-                        </p>
-                        <p class="waiting" style="text-align: center; margin-top: 2rem; opacity: 0; animation: fadeInUp 0.6s ease 2.5s forwards; color: var(--velvet-gold); font-size: 1.3rem;">
-                            THEY’RE waiting for you.
-                        </p>
-                        <br><br>
-                        <a href="contract.php?done=1" class="btn-enter">
-                            ENTER THE VELVET ROOM
-                        </a>
-                    </div>
-                `;
-                this.elements.viewport.scrollTop = 0;
+                    `;
+                    this.elements.viewport.scrollTop = 0;
+
+                    // Fade content back in
+                    this.elements.content.style.opacity = 1;
+                }, 500);
             }
         };
 
