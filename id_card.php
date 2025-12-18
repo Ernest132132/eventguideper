@@ -19,7 +19,7 @@ $qrData = "OP-" . $operative['id'];
 
 // 3. VISUAL LOGIC
 $pulseClass = ""; 
-$statusColor = "var(--velvet-gold)";
+$statusColor = "var(--accent-gold)";
 $statusText = "CONTRACT PENDING";
 $specialCardClass = ""; 
 $instruction = "Show this to staff for upgrades/activity check-in.";
@@ -43,11 +43,11 @@ if ($operative['bp_owned'] == 1) {
         $statusText = "ACTIVE";
         $instruction = "Collect stamps at stations.";
     } elseif ($operative['status'] == 'eligible') {
-        $statusColor = "var(--velvet-green)"; 
+        $statusColor = "var(--accent-green)"; 
         $statusText = "REWARD UNLOCKED"; 
         $instruction = "Go to Info Booth to redeem.";
     } elseif ($operative['status'] == 'redeemed') {
-        $statusColor = "var(--velvet-red)"; 
+        $statusColor = "var(--accent-red)"; 
         $statusText = "REDEEMED"; 
         $instruction = "Reward claimed.";
     }
@@ -57,7 +57,7 @@ if ($operative['bp_owned'] == 1) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Contract</title>
+    <title>My ID Card</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=36">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -118,8 +118,8 @@ if ($operative['bp_owned'] == 1) {
     <div class="container page-visible">
         
         <div class="profile-header" style="border-bottom: none; margin-bottom: 10px;">
-            <h1 style="font-size: 1.8rem; margin-bottom: 5px;">MY CONTRACT</h1>
-            <p style="font-size: 0.8rem; letter-spacing: 2px; color: var(--velvet-gold); margin: 0;">IDENTIFICATION</p>
+            <h1 style="font-size: 1.8rem; margin-bottom: 5px;">MY ID CARD</h1>
+            <p style="font-size: 0.8rem; letter-spacing: 2px; color: var(--accent-gold); margin: 0;">IDENTIFICATION</p>
         </div>
 
         <div class="card <?php echo $pulseClass . ' ' . $specialCardClass; ?>" style="text-align: center; border-color: <?php echo $statusColor; ?>; margin-bottom: 25px;">

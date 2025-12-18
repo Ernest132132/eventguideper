@@ -34,8 +34,8 @@ $error = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $code = trim($_POST['passcode']);
     
-    // Validate Code
-    if (strtoupper($code) === "REALITY") {
+    // Validate Code - Change this to your event's keyword
+    if (strtoupper($code) === "AGREE") {
         // STATE CHANGE: PENDING -> ACTIVE
         $pdo->prepare("UPDATE operatives SET status = 'active' WHERE id = ?")->execute([$_SESSION['user_id']]);
         $_SESSION['status'] = 'active';
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // TRIGGER TRANSITION (Allows us to bypass the redirect for this one load)
         $transition_active = true;
     } else {
-        $error = "The contract rejects this code. Consult Akechi and Kasumi.";
+        $error = "Invalid code. Please check with event staff.";
     }
 }
 
@@ -71,7 +71,7 @@ $qrData = "OP-" . $_SESSION['user_id'];
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sign Contract | All-Out Holiday</title>
+    <title>Sign Agreement | Event Guide</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=39"> 
     <style>
@@ -198,8 +198,8 @@ $qrData = "OP-" . $_SESSION['user_id'];
                 <div class="fog-layer"></div>
             </div>
 
-            <div class="seal-text">The contract is sealed</div>
-            <div class="sub-text">Welcome to the Velvet Room</div>
+            <div class="seal-text">Agreement Confirmed</div>
+            <div class="sub-text">Welcome to the Event</div>
         </div>
         
         <script>
@@ -213,33 +213,31 @@ $qrData = "OP-" . $_SESSION['user_id'];
         <div class="fabric-container"><div class="fabric-wave"></div><div class="fabric-wave"></div></div>
         <div class="container page-visible">
             <br>
-            <h1 style="color: var(--velvet-gold); text-shadow: 0 0 10px var(--velvet-gold);">THE CONTRACT</h1>
+            <h1 style="color: var(--accent-gold); text-shadow: 0 0 10px var(--accent-gold);">EVENT AGREEMENT</h1>
             
             <div class="card" style="border-color: var(--velvet-gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);">
                 
                 <div class="contract-rules">
                     <div class="rule-row">
                         <span class="rule-num">I.</span>
-                        <span>Do not touch the shadows (performers) unless they've invited you to.</span>
+                        <span>Be respectful to all performers and staff at the event.</span>
                     </div>
                     <div class="rule-row">
                         <span class="rule-num">II.</span>
-                        <span>This experience is shared; let other guests also have their time talking with performers.</span>
+                        <span>This experience is shared; please be mindful of other guests.</span>
                     </div>
                     <div class="rule-row">
                         <span class="rule-num">III.</span>
-                        <span>The shadows aren't able to break character, so play along with the illusion.</span>
+                        <span>Follow all posted event rules and staff instructions.</span>
                     </div>
                     <div class="rule-row">
                         <span class="rule-num">IV.</span>
-                        <span>If anything feels wrong and/or you need help, find staff at the Info Booth immediately.</span>
+                        <span>If you need assistance, please find staff at the Info Booth.</span>
                     </div>
                 </div>
 
-                <p style="font-family: 'Cinzel', serif; font-size: 1rem; line-height: 1.6; color: var(--velvet-gold-light); margin-bottom: 25px; font-style: italic;">
-                    "I am thou, thou art I... Thou hast acquired a new vow.<br><br>
-                    The events of this day are shaped by thine own cognition, with thine actions being yours, and yours alone.<br><br>
-                    By sealing the contract, thou wilt experience a plight that wilt bring thee closer to the truth."
+                <p style="font-family: 'Cinzel', serif; font-size: 1rem; line-height: 1.6; color: var(--accent-gold-light); margin-bottom: 25px; font-style: italic;">
+                    By agreeing to participate, you acknowledge that you have read and will follow all event guidelines.
                 </p>
                 
                 <?php if($error): ?>
@@ -254,12 +252,12 @@ $qrData = "OP-" . $_SESSION['user_id'];
                         </div>
                     </div>
 
-                    <label style="color: var(--velvet-gold);">VELVET ROOM KEYWORD</label>
-                    <input type="text" name="passcode" placeholder="Enter code..." required autocomplete="off" style="border-color: var(--velvet-gold); color: var(--velvet-gold);">
-    
-                    <button type="submit" class="btn-gold" style="background: var(--velvet-gold); color: #000; margin-top: 15px; width: 100%; border: 1px solid white;">
-                        SEAL THE CONTRACT
-                     </button>
+                    <label style="color: var(--accent-gold);">EVENT KEYWORD</label>
+                    <input type="text" name="passcode" placeholder="Enter code..." required autocomplete="off" style="border-color: var(--accent-gold); color: var(--accent-gold);">
+
+                    <button type="submit" class="btn-gold" style="background: var(--accent-gold); color: #000; margin-top: 15px; width: 100%; border: 1px solid white;">
+                        CONFIRM AGREEMENT
+                    </button>
                 </form>
             </div>
 

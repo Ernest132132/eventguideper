@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>The Registry | All-Out Holiday</title>
+    <title>Registration | Event Guide</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=34"> 
     <style> .split-container { border-top: 1px solid var(--velvet-silver); margin-top: 20px; padding-top: 20px; } </style>
@@ -48,8 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <div class="container page-visible">
         <br><br>
-        <h1>Welcome to the<br>Velvet Room</h1>
-        <p>State your intentions.</p>
+        <h1>Welcome to the<br>Event Guide</h1>
+        <p>Register to get started.</p>
         
         <div class="card">
             <h2>The Registry</h2>
@@ -64,12 +64,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <h3 style="color: var(--velvet-gold); font-size: 1rem; margin-bottom: 10px;">PARTICIPATING GUEST</h3>
                 
-                <input type="text" 
-                       name="codename" 
-                       placeholder="Enter Alias (e.g. Joker)" 
-                       maxlength="20" 
+                <input type="text"
+                       name="codename"
+                       placeholder="Enter Your Name/Alias"
+                       maxlength="20"
                        autocomplete="off"
-                       pattern="[a-zA-Z0-9]+" 
+                       pattern="[a-zA-Z0-9]+"
                        title="Only letters and numbers are allowed."
                        oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')">
                        
@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </p>
 
         <p style="font-size: 0.65rem; color: #666; margin-top: 25px; line-height: 1.4;">
-            By entering the Velvet Room, you agree to our<br>
+            By registering, you agree to our<br>
             <a href="tos.php" style="color: #888; text-decoration: underline;">Terms of Service</a>.
         </p>
     </div>

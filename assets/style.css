@@ -1,27 +1,39 @@
 /*
 |--------------------------------------------------------------------------
-| FINAL STYLE.CSS: DEEP VELVET IMMERSION (Smooth Edition)
+| EVENT GUIDE TEMPLATE - Style Sheet
 |--------------------------------------------------------------------------
-| Merged stable layout with "Fabric of Reality" background and Card Flip logic.
-| REMOVED: Jagged edges (clip-path).
-| ADDED: Deep animated background, 3D Page Transitions, Life Pulse.
+| A reusable template for event guide applications.
+| Customize the color variables below to match your event's branding.
 */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
-/* --- 1. CORE VARIABLES --- */
+/* --- 1. CORE VARIABLES (Customize these for your event) --- */
 :root {
-    --velvet-dark-blue: #02020a; /* Deepest Void Blue */
-    --velvet-medium-blue: #0e1638; /* Rich Navy */
-    --velvet-accent-blue: #1b2845; /* Lighter Accent */
-    --velvet-gold: #d4af37;
-    --velvet-gold-light: #fceabb;
-    --velvet-red: #d90018; 
-    --velvet-silver: #c0c0c0;
-    --velvet-green: #00d26a;
-    --velvet-light-text: #e0e0e0;
-    --velvet-dark-text: #050610;
+    /* Primary Colors - Change these to match your event branding */
+    --accent-dark-blue: #02020a;
+    --accent-medium-blue: #0e1638;
+    --accent-blue: #1b2845;
+    --accent-gold: #d4af37;
+    --accent-gold-light: #fceabb;
+    --accent-red: #d90018;
+    --accent-silver: #c0c0c0;
+    --accent-green: #00d26a;
+    --accent-light-text: #e0e0e0;
+    --accent-dark-text: #050610;
+
+    /* Legacy aliases (for backwards compatibility) */
+    --velvet-dark-blue: var(--accent-dark-blue);
+    --velvet-medium-blue: var(--accent-medium-blue);
+    --velvet-accent-blue: var(--accent-blue);
+    --velvet-gold: var(--accent-gold);
+    --velvet-gold-light: var(--accent-gold-light);
+    --velvet-red: var(--accent-red);
+    --velvet-silver: var(--accent-silver);
+    --velvet-green: var(--accent-green);
+    --velvet-light-text: var(--accent-light-text);
+    --velvet-dark-text: var(--accent-dark-text);
 }
 
 /* --- 2. GLOBAL & BACKGROUND --- */
