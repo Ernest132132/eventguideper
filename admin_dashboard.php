@@ -162,17 +162,10 @@ if (isset($_GET['view_user'])) {
         $s4 = $pdo->prepare("SELECT id FROM high_scores_p4 WHERE operative_id = ?"); $s4->execute([$uid]);
         $d_scores['p4'] = $s4->fetch() ? 'CLEARED' : 'Incomplete';
 
-        // FALSE SHADOW GUESS (NEW)
-        $sg = $pdo->prepare("SELECT guessed_char FROM shadow_guesses WHERE operative_id = ?");
-        $sg->execute([$uid]);
-        $guess = $sg->fetchColumn();
-        if ($guess) {
-            if ($guess === 'Yukiko Amagi') {
-                $d_shadow_status = "<span style='color:#00d26a'>CORRECT (Yukiko Amagi)</span>";
-            } else {
-                $d_shadow_status = "<span style='color:#E60012'>INCORRECT (" . htmlspecialchars($guess) . ")</span>";
-            }
-        }
+        // Custom game/activity tracking (customize for your event)
+        // $sg = $pdo->prepare("SELECT ... FROM ... WHERE operative_id = ?");
+        // $sg->execute([$uid]);
+        // $d_shadow_status = "N/A";
 
         // Logs (Using created_at)
         $sl = $pdo->prepare("SELECT station_name, DATE_FORMAT(created_at, '%h:%i %p') as time FROM mission_logs WHERE operative_id = ? ORDER BY created_at DESC");
@@ -190,7 +183,7 @@ if (isset($_GET['view_user'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Command | Velvet Room</title>
+    <title>Admin Dashboard | Event Guide</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=50">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -456,19 +449,13 @@ if (isset($_GET['view_user'])) {
                     </div>
                 </div>
 
+                <!-- Custom Activity Tracking Section (customize for your event) -->
+                <!--
                 <div class="data-box" style="margin-bottom: 20px; border-color: #9900ff;">
-                    <span class="data-label">False Shadow Guess</span>
-                    <div style="font-size: 1rem; font-weight: bold;">
-                        <?php echo $d_shadow_status; ?>
-                    </div>
+                    <span class="data-label">Activity Status</span>
+                    <div style="font-size: 1rem; font-weight: bold;">N/A</div>
                 </div>
-
-                <h3 style="font-size:1rem; border-bottom:1px solid #444; padding-bottom:5px; margin-top:20px;">MINI-GAME STATUS</h3>
-                <div style="display:flex; justify-content:space-between; margin-bottom:20px; text-align:center;">
-                    <div><span class="data-label">P3 Tartarus</span><span class="data-val" style="color:#2aeaff;"><?php echo $d_scores['p3']; ?></span></div>
-                    <div><span class="data-label">P4 TV World</span><span class="data-val" style="color:#fefe22;"><?php echo $d_scores['p4']; ?></span></div>
-                    <div><span class="data-label">P5 Mementos</span><span class="data-val" style="color:#ff2a2a;"><?php echo $d_scores['p5']; ?></span></div>
-                </div>
+                -->
 
                 <h3 style="font-size:1rem; border-bottom:1px solid #444; padding-bottom:5px;">STATION LOGS</h3>
                 <div class="logs-list">
@@ -504,9 +491,10 @@ if (isset($_GET['view_user'])) {
                         <input type="hidden" name="target_id" value="<?php echo $d_user['id']; ?>">
                         <select name="station_name" style="background:black; color:white; border:1px solid #666; padding:10px; flex:1;">
                             <option value="Admin Override">General Override</option>
-                            <option value="P3 Station">P3 Station</option>
-                            <option value="P4 Station">P4 Station</option>
-                            <option value="P5 Station">P5 Station</option>
+                            <!-- Add your event stations here -->
+                            <option value="Station A">Station A</option>
+                            <option value="Station B">Station B</option>
+                            <option value="Station C">Station C</option>
                         </select>
                         <button type="submit" name="manual_stamp" class="btn-gold" style="width:auto; font-size:0.8rem;">STAMP</button>
                     </form>

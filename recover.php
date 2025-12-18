@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Recover ID | All-Out Holiday</title>
+    <title>Recover ID | Event Guide</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=12">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <form method="POST">
                 <label>Codename:</label>
-                <input type="text" name="codename" placeholder="e.g. Joker" maxlength="20" required autocomplete="off">
+                <input type="text" name="codename" placeholder="Your name/alias" maxlength="20" required autocomplete="off">
 
                 <label>Rescue Code:</label>
                 <input type="number" name="rescue_code" placeholder="XXXX" pattern="[0-9]{4}" required autocomplete="off">

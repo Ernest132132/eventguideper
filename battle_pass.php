@@ -20,7 +20,7 @@ $qrData = "BP-" . $_SESSION['user_id'];
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Battle Pass | All-Out Holiday</title>
+    <title>Battle Pass | Event Guide</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=26">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

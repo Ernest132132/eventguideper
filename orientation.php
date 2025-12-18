@@ -19,9 +19,9 @@ if ($user['role'] === 'observer') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Orientation | All-Out Holiday</title>
+    <title>Orientation | Event Guide</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/style.css?v=39"> 
+    <link rel="stylesheet" href="assets/style.css?v=39">
     <style>
         .orientation-list {
             list-style: none; padding: 0; margin: 0;
@@ -36,44 +36,42 @@ if ($user['role'] === 'observer') {
         }
         .orientation-list li:last-child { border-bottom: none; }
         .orientation-list li::before {
-            content: '♦'; color: var(--velvet-red);
+            content: '♦'; color: var(--accent-gold);
             position: absolute; left: 0; top: 0;
         }
-        strong { color: var(--velvet-gold); }
+        strong { color: var(--accent-gold); }
     </style>
 </head>
 <body>
-    
+
     <div class="fabric-container"><div class="fabric-wave"></div><div class="fabric-wave"></div></div>
     <div class="fog-container"><div class="fog-layer"></div><div class="fog-layer"></div></div>
 
     <div class="container page-visible">
         <br>
-        <h1 style="color: var(--velvet-gold); font-family: 'Cinzel', serif; font-size: 1.5rem; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);">
+        <h1 style="color: var(--accent-gold); font-family: 'Cinzel', serif; font-size: 1.5rem; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);">
             ORIENTATION
         </h1>
-        
-        <div class="card" style="border-color: var(--velvet-gold);">
-            
+
+        <div class="card" style="border-color: var(--accent-gold);">
+
             <p style="font-style: italic; color: #fff; margin-bottom: 30px; opacity: 0.9;">
-                Welcome to <strong>Portal to the Velvet Room: All-Out Holiday</strong>. This app is your digital companion for the event.
+                Welcome! This app is your digital companion for the event.
             </p>
 
+            <!-- TEMPLATE: Customize these orientation items for your event -->
             <ul class="orientation-list">
                 <li>
-                    <strong>ASSISTANCE:</strong> The Info Booth located at the end of the event (next to the Persona 3 area) will handle experience upgrades and answer all questions.
+                    <strong>ASSISTANCE:</strong> The Info Booth will handle experience upgrades and answer all questions.
                 </li>
                 <li>
                     <strong>EVENT ID:</strong> Your Event ID is how your progress is tracked. Show your event ID for activity check-ins and reward redemption.
                 </li>
                 <li>
-                    <strong>BOOKINGS:</strong> Reservations for the activity stations can be made in the Booking app. If no slots are available, physical waitlists are available at every station.
+                    <strong>BOOKINGS:</strong> Reservations for activity stations can be made in the Booking app. If no slots are available, physical waitlists may be available at each station.
                 </li>
                 <li>
                     <strong>REWARDS:</strong> To receive your rewards, you must check in with at least one activity station and complete the activity.
-                </li>
-                <li>
-                    <strong>INVESTIGATION:</strong> You and your friends will not be able to solve this investigation alone. In order to get the full picture, you must talk with attendees who participated in other activities and search your event guide. We wish you the best of luck in seeing the shadow.
                 </li>
             </ul>
 
