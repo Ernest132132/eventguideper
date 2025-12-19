@@ -9,24 +9,6 @@ $stmt = $pdo->prepare("SELECT status, codename FROM operatives WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
-// --- NEW PROLOGUE INTERCEPT LOGIC ---
-if ($user['status'] === 'pending') {
-    // If returning from prologue (skipped or finished), set the session flag
-    if (isset($_GET['done'])) {
-        $_SESSION['prologue_seen'] = true;
-        // Redirect to self to clean URL
-        header("Location: contract.php");
-        exit();
-    }
-
-    // If they haven't seen it yet, send them there
-    if (!isset($_SESSION['prologue_seen'])) {
-        header("Location: prologue.php");
-        exit();
-    }
-}
-// ------------------------------------
-
 $transition_active = false;
 $error = "";
 
@@ -78,7 +60,7 @@ $qrData = "OP-" . $_SESSION['user_id'];
         /* --- CONTRACT STYLES --- */
         .contract-rules {
             background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--velvet-gold);
+            border: 1px solid var(--accent-gold);
             padding: 20px;
             margin-bottom: 25px;
             text-align: left;
@@ -90,9 +72,9 @@ $qrData = "OP-" . $_SESSION['user_id'];
             top: -10px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--velvet-medium-blue);
+            background: var(--accent-dark-blue);
             padding: 0 10px;
-            color: var(--velvet-gold);
+            color: var(--accent-gold);
             font-family: 'Cinzel', serif;
             font-size: 0.8rem;
             letter-spacing: 2px;
@@ -106,14 +88,14 @@ $qrData = "OP-" . $_SESSION['user_id'];
             line-height: 1.4;
         }
         .rule-num {
-            color: var(--velvet-gold); /* Changed to Gold */
+            color: var(--accent-gold);
             font-weight: bold;
             margin-right: 10px;
             font-family: 'Cinzel', serif;
             min-width: 25px;
         }
         .signature-line {
-            border-bottom: 2px solid var(--velvet-gold);
+            border-bottom: 2px solid var(--accent-gold);
             padding-bottom: 5px;
             margin-bottom: 5px;
             font-family: 'Cinzel', serif;
@@ -141,18 +123,18 @@ $qrData = "OP-" . $_SESSION['user_id'];
         .seal-text {
             font-family: 'Cinzel', serif;
             font-size: 2rem;
-            color: var(--velvet-gold-light);
+            color: var(--accent-gold-light);
             letter-spacing: 6px;
             text-transform: uppercase;
-            
+
             /* Initial State */
             opacity: 0;
             filter: blur(10px);
             transform: scale(0.9);
-            
+
             /* Animation: 2 seconds long */
             animation: manifestText 2s ease-out forwards 0.3s;
-            text-shadow: 0 0 20px var(--velvet-gold), 0 0 40px var(--velvet-blue);
+            text-shadow: 0 0 20px var(--accent-gold), 0 0 40px var(--accent-dark-blue);
         }
 
         /* The Subtitle "Welcome" */
@@ -205,7 +187,7 @@ $qrData = "OP-" . $_SESSION['user_id'];
         <script>
             // 5000ms = 5 seconds total.
             setTimeout(function() {
-                window.location.href = 'orientation.php';
+                window.location.href = 'home.php';
             }, 4500);
         </script>
 
@@ -215,7 +197,7 @@ $qrData = "OP-" . $_SESSION['user_id'];
             <br>
             <h1 style="color: var(--accent-gold); text-shadow: 0 0 10px var(--accent-gold);">EVENT AGREEMENT</h1>
             
-            <div class="card" style="border-color: var(--velvet-gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);">
+            <div class="card" style="border-color: var(--accent-gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);">
                 
                 <div class="contract-rules">
                     <div class="rule-row">
@@ -246,7 +228,7 @@ $qrData = "OP-" . $_SESSION['user_id'];
 
                 <form method="POST">
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <label style="color: var(--velvet-silver); font-size: 0.7rem; letter-spacing: 2px; text-align: center;">CONTRACTOR IDENTITY</label>
+                        <label style="color: #aaa; font-size: 0.7rem; letter-spacing: 2px; text-align: center;">PARTICIPANT</label>
                         <div class="signature-line">
                             <?php echo htmlspecialchars($codename); ?>
                         </div>
@@ -262,11 +244,11 @@ $qrData = "OP-" . $_SESSION['user_id'];
             </div>
 
             <div style="text-align: center; margin-top: 40px; margin-bottom: 20px; opacity: 0.8;">
-                <div class="qr-frame" style="border: 2px solid var(--velvet-gold); padding: 5px; background: white; display: inline-block;">
+                <div class="qr-frame" style="border: 2px solid var(--accent-gold); padding: 5px; background: white; display: inline-block;">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<?php echo $qrData; ?>" alt="ID QR">
                 </div>
-                <p style="font-size: 0.75rem; color: var(--velvet-gold); margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">
-                    Show to Staff for RSVP Check-In / Experience Upgrades
+                <p style="font-size: 0.75rem; color: var(--accent-gold); margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">
+                    Show to Staff for Check-In / Upgrades
                 </p>
             </div>
 
