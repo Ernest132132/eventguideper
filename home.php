@@ -40,36 +40,28 @@ if (isset($_SESSION['new_user_rescue'])) {
 <head>
     <title>Traveler Hub | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/style.css?v=51">
+    <link rel="stylesheet" href="assets/style.css?v=52">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 </head>
 <body>
-
 
     <div class="container page-visible">
 
         <div class="profile-header">
-            <div style="font-size: 1.5rem; margin-bottom: 5px;">🏮</div>
-            <h2 style="font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 10px; line-height: 1.4;">
-                LANTERN RITE 2025
-            </h2>
-            <hr style="border: 0; border-top: 1px solid rgba(255,215,0,0.3); width: 60%; margin: 10px auto;">
-            <p style="font-size: 0.7rem; letter-spacing: 2px; opacity: 0.7;">
+            <div style="font-size: 2rem; margin-bottom: 4px;">🏮</div>
+            <p style="font-size: 0.7rem; letter-spacing: 2px; margin: 0 0 4px 0;">
                 <?php echo ($role == 'observer') ? 'VISITOR' : 'TRAVELER'; ?>
             </p>
             <h1><?php echo htmlspecialchars($codename); ?></h1>
+            <p style="font-size: 0.75rem; opacity: 0.9; margin: 4px 0 0 0;">Lantern Rite 2025</p>
         </div>
 
         <?php if ($rescueCode && $role !== 'observer'): ?>
-            <div class="rescue-box" id="rescue-card" style="padding: 20px; background: #1a1a1a; border: 1px solid var(--velvet-red); border-radius: 5px; text-align: center; margin-bottom: 20px;">
-                <h2 style="color: var(--velvet-red); margin-top: 0;">⚠ ID RECOVERY CODE ⚠</h2>
-                <p style="color: #ccc; font-size: 0.8rem;">Don't lose this code! It's the only way to recover your ID and/or log into a different device.</p>
-                <div style="background: #000; padding: 10px; border: 1px dashed #444; margin: 10px 0;">
-                    <span class="rescue-code" style="font-size: 1.2rem; font-weight: bold; letter-spacing: 3px; color: #fff;"><?php echo $rescueCode; ?></span>
-                </div>
-                
+            <div class="rescue-box" id="rescue-card">
+                <h2>📋 Save Your Recovery Code</h2>
+                <p>Keep this code safe! You'll need it to recover your account or log in on another device.</p>
+                <div class="rescue-code"><?php echo $rescueCode; ?></div>
                 <button id="btn-save-code" class="save-img-btn">
                     <i class="fa-solid fa-camera"></i> Save as Image
                 </button>
@@ -92,8 +84,8 @@ if (isset($_SESSION['new_user_rescue'])) {
                 ?>
 
                 <?php if ($isBooked): ?>
-                    <a href="booking.php" class="app-btn" style="border-color: #00d26a; color: #00d26a; background: rgba(0, 210, 106, 0.1);">
-                        <i class="fa-solid fa-calendar-check"></i><span>My Reservation</span>
+                    <a href="booking.php" class="app-btn" style="background: #E8F5E9; border: 2px solid #4CAF50;">
+                        <i class="fa-solid fa-calendar-check" style="color: #4CAF50;"></i><span>My Reservation</span>
                     </a>
                 <?php else: ?>
                     <a href="booking.php" class="app-btn">
@@ -112,19 +104,19 @@ if (isset($_SESSION['new_user_rescue'])) {
             <!-- <a href="https://www.instagram.com/your_handle/" target="_blank" class="app-btn"><i class="fa-brands fa-instagram"></i><span>Adventurer's Guild</span></a> -->
 
             <?php if ($role == 'observer'): ?>
-                <a href="upgrade_access.php" class="app-btn" style="grid-column: span 2; border-color: var(--accent-green); color: var(--accent-green); background: rgba(76, 175, 80, 0.1);">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i><span>Become a Traveler</span>
+                <a href="upgrade_access.php" class="app-btn" style="grid-column: span 2; background: #E8F5E9; border: 2px solid #4CAF50;">
+                    <i class="fa-solid fa-arrow-up-right-from-square" style="color: #4CAF50;"></i><span style="color: #2E7D32;">Become a Traveler</span>
                 </a>
             <?php endif; ?>
 
             <?php if ($role == 'operative'): ?>
                 <?php if ($bp_owned): ?>
-                    <a href="id_card.php" class="app-btn" style="grid-column: span 2; border-color: #FFD700; color: #FFD700; background: rgba(212, 175, 55, 0.15);">
-                        <i class="fa-solid fa-crown"></i><span>🌟 GENESIS CRYSTAL PASS</span>
+                    <a href="id_card.php" class="app-btn" style="grid-column: span 2; background: linear-gradient(135deg, #FFF8E1, #FFECB3); border: 2px solid #D4A017;">
+                        <i class="fa-solid fa-crown" style="color: #D4A017;"></i><span style="color: #8B6914;">🌟 GENESIS CRYSTAL PASS</span>
                     </a>
                 <?php else: ?>
-                    <a href="id_card.php?action=upgrade" class="app-btn" style="grid-column: span 2; border-color: var(--lantern-orange); background: rgba(255, 140, 66, 0.15); color: var(--lantern-orange);">
-                        <i class="fa-solid fa-gem"></i> <span>GET PREMIUM PASS</span>
+                    <a href="id_card.php?action=upgrade" class="app-btn" style="grid-column: span 2; background: linear-gradient(135deg, #FFF3E0, #FFE0B2); border: 2px solid #E67E22;">
+                        <i class="fa-solid fa-gem" style="color: #E67E22;"></i><span style="color: #D35400;">GET PREMIUM PASS</span>
                     </a>
                 <?php endif; ?>
             <?php endif; ?>
@@ -132,13 +124,11 @@ if (isset($_SESSION['new_user_rescue'])) {
 
         </div>
 
-        <br><br>
-        <p style="font-size: 0.7rem; opacity: 0.5; margin-bottom: 5px;">✦ Liyue Harbor ✦</p>
-        <a href="tos.php" style="font-size: 0.6rem; color: #444; text-decoration: none;">[ TERMS OF SERVICE ]</a>
+        <div style="text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--paper-tan);">
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">🏮 Liyue Harbor</p>
+            <a href="tos.php" style="font-size: 0.75rem; color: var(--text-muted);">Terms of Service</a>
+        </div>
     </div>
-
-    <div class="fabric-container"><div class="fabric-wave"></div><div class="fabric-wave"></div></div>
-    <div class="fog-container"><div class="fog-layer"></div><div class="fog-layer"></div></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

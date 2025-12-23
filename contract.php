@@ -52,122 +52,110 @@ $qrData = "OP-" . $_SESSION['user_id'];
 <head>
     <title>Festival Agreement | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/style.css?v=50">
+    <link rel="stylesheet" href="assets/style.css?v=52">
     <style>
         /* --- FESTIVAL CONTRACT STYLES --- */
         .contract-rules {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--accent-gold);
+            background: var(--paper-warm);
+            border: 2px dashed var(--paper-tan);
+            border-radius: 12px;
             padding: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 24px;
             text-align: left;
-            position: relative;
         }
-        .contract-rules::before {
-            content: "✦ FESTIVAL GUIDELINES ✦";
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent-dark-blue);
-            padding: 0 10px;
-            color: var(--accent-gold);
-            font-family: 'Cinzel', serif;
+        .rules-title {
+            text-align: center;
             font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
             letter-spacing: 2px;
-            white-space: nowrap;
+            color: var(--liyue-red);
+            margin-bottom: 16px;
         }
         .rule-row {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: flex;
             align-items: flex-start;
             font-size: 0.9rem;
-            color: var(--accent-silver);
-            line-height: 1.4;
+            color: var(--text-medium);
+            line-height: 1.5;
         }
         .rule-num {
-            color: var(--accent-gold);
-            font-weight: bold;
-            margin-right: 10px;
-            font-family: 'Cinzel', serif;
-            min-width: 25px;
+            color: var(--liyue-red);
+            font-weight: 700;
+            margin-right: 12px;
+            min-width: 24px;
         }
-        .signature-line {
-            border-bottom: 2px solid var(--accent-gold);
-            padding-bottom: 5px;
-            margin-bottom: 5px;
-            font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
-            color: white;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            letter-spacing: 1px;
+        .signature-box {
+            background: var(--paper-warm);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .signature-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--liyue-gold);
+            padding-bottom: 4px;
+            display: inline-block;
         }
 
-        /* --- LANTERN TRANSITION STYLES --- */
+        /* --- TRANSITION OVERLAY --- */
         .transition-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #2B1111 0%, #0D0505 100%);
+            background: linear-gradient(135deg, var(--liyue-red) 0%, var(--liyue-red-dark) 100%);
             z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             opacity: 0;
-            animation: fadeInDeep 0.5s forwards;
+            animation: fadeIn 0.5s forwards;
         }
 
         .seal-text {
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
-            color: var(--accent-gold-light);
-            letter-spacing: 6px;
-            text-transform: uppercase;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: white;
+            letter-spacing: 2px;
+            text-align: center;
             opacity: 0;
-            filter: blur(10px);
-            transform: scale(0.9);
-            animation: manifestText 2s ease-out forwards 0.3s;
-            text-shadow: 0 0 20px var(--accent-gold), 0 0 40px var(--lantern-crimson);
+            animation: fadeInUp 1.5s ease-out forwards 0.3s;
+            padding: 0 20px;
         }
 
         .sub-text {
-            font-family: 'Lato', sans-serif;
-            color: var(--accent-silver);
+            color: rgba(255,255,255,0.8);
             font-size: 0.9rem;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            margin-top: 15px;
+            margin-top: 12px;
             opacity: 0;
-            animation: subTextCycle 2.5s ease-in-out forwards 1s;
+            animation: fadeInUp 1.5s ease-out forwards 0.8s;
         }
 
         .lantern-float {
-            font-size: 3rem;
+            font-size: 4rem;
             margin-bottom: 20px;
-            animation: lanternBob 2s ease-in-out infinite;
+            animation: gentleBob 2s ease-in-out infinite;
         }
 
-        @keyframes lanternBob {
+        @keyframes gentleBob {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
 
-        @keyframes fadeInDeep {
+        @keyframes fadeIn {
             to { opacity: 1; }
         }
 
-        @keyframes manifestText {
-            0% { opacity: 0; filter: blur(15px); transform: scale(0.95); }
-            40% { opacity: 1; filter: blur(0px); transform: scale(1); }
-            80% { opacity: 1; filter: blur(0px); transform: scale(1); }
-            100% { opacity: 0; filter: blur(5px); transform: scale(1.05); }
-        }
-
-        @keyframes subTextCycle {
-            0% { opacity: 0; transform: translateY(10px); }
-            20% { opacity: 0.8; transform: translateY(0); }
-            70% { opacity: 0.8; }
-            100% { opacity: 0; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -175,11 +163,6 @@ $qrData = "OP-" . $_SESSION['user_id'];
 
     <?php if ($transition_active): ?>
         <div class="transition-overlay">
-            <div class="fog-container" style="z-index: -1;">
-                <div class="fog-layer"></div>
-                <div class="fog-layer"></div>
-            </div>
-
             <div class="lantern-float">🏮</div>
             <div class="seal-text">May Your Wishes Come True</div>
             <div class="sub-text">Welcome to Lantern Rite</div>
@@ -188,74 +171,73 @@ $qrData = "OP-" . $_SESSION['user_id'];
         <script>
             setTimeout(function() {
                 window.location.href = 'home.php';
-            }, 4500);
+            }, 3500);
         </script>
 
     <?php else: ?>
-        <div class="fabric-container"><div class="fabric-wave"></div><div class="fabric-wave"></div></div>
         <div class="container page-visible">
-            <br>
-            <div style="font-size: 2rem; margin-bottom: 10px;">🏮</div>
-            <h1 style="color: var(--accent-gold); text-shadow: 0 0 10px var(--accent-gold);">FESTIVAL AGREEMENT</h1>
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 3rem; margin-bottom: 8px;">🏮</div>
+                <h1>Festival Agreement</h1>
+                <p>Please review our guidelines before joining.</p>
+            </div>
 
-            <div class="card" style="border-color: var(--accent-gold); box-shadow: 0 0 20px rgba(212, 160, 23, 0.3);">
-
+            <div class="card">
                 <div class="contract-rules">
+                    <div class="rules-title">Festival Guidelines</div>
                     <div class="rule-row">
-                        <span class="rule-num">I.</span>
+                        <span class="rule-num">1.</span>
                         <span>Treat all performers, vendors, and fellow Travelers with respect.</span>
                     </div>
                     <div class="rule-row">
-                        <span class="rule-num">II.</span>
+                        <span class="rule-num">2.</span>
                         <span>The spirit of Lantern Rite is one of unity; please be mindful of other guests.</span>
                     </div>
                     <div class="rule-row">
-                        <span class="rule-num">III.</span>
+                        <span class="rule-num">3.</span>
                         <span>Follow all posted event rules and Millelith (staff) instructions.</span>
                     </div>
                     <div class="rule-row">
-                        <span class="rule-num">IV.</span>
+                        <span class="rule-num">4.</span>
                         <span>For assistance, seek the Adventurer's Guild booth or any staff member.</span>
                     </div>
                 </div>
 
-                <p style="font-family: 'Cinzel', serif; font-size: 1rem; line-height: 1.6; color: var(--accent-gold-light); margin-bottom: 25px; font-style: italic;">
+                <p style="text-align: center; font-style: italic; color: var(--text-light); margin-bottom: 24px;">
                     "May the flames of wisdom spread to all, and never be extinguished."
                 </p>
 
                 <?php if($error): ?>
-                    <div class="alert" style="border-color: var(--accent-red); color: #ff6b6b;"><?php echo $error; ?></div>
+                    <div class="alert"><?php echo $error; ?></div>
                 <?php endif; ?>
 
                 <form method="POST">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <label style="color: #aaa; font-size: 0.7rem; letter-spacing: 2px; text-align: center;">TRAVELER NAME</label>
-                        <div class="signature-line">
-                            <?php echo htmlspecialchars($codename); ?>
-                        </div>
+                    <div class="signature-box">
+                        <label style="margin: 0 0 8px 0; display: block;">Traveler Name</label>
+                        <div class="signature-name"><?php echo htmlspecialchars($codename); ?></div>
                     </div>
 
-                    <label style="color: var(--accent-gold);">FESTIVAL KEYWORD</label>
-                    <input type="text" name="passcode" placeholder="Enter the keyword..." required autocomplete="off" style="border-color: var(--accent-gold); color: var(--accent-gold);">
+                    <label>Festival Keyword</label>
+                    <input type="text" name="passcode" placeholder="Enter the keyword..." required autocomplete="off">
 
-                    <button type="submit" class="btn-gold" style="background: var(--accent-gold); color: #000; margin-top: 15px; width: 100%; border: 1px solid white;">
-                        🏮 LIGHT MY LANTERN
+                    <button type="submit" class="btn-gold" style="margin-top: 16px;">
+                        🏮 Light My Lantern
                     </button>
                 </form>
             </div>
 
-            <div style="text-align: center; margin-top: 40px; margin-bottom: 20px; opacity: 0.8;">
-                <div class="qr-frame" style="border: 2px solid var(--accent-gold); padding: 5px; background: white; display: inline-block;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<?php echo $qrData; ?>" alt="Festival Pass QR">
+            <div style="text-align: center; margin-top: 32px;">
+                <div class="qr-frame">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?php echo $qrData; ?>" alt="Festival Pass QR" style="width: 200px; height: 200px;">
                 </div>
-                <p style="font-size: 0.75rem; color: var(--accent-gold); margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">
-                    Show to Staff for Check-In / Upgrades
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 12px;">
+                    Show to staff for check-in or upgrades
                 </p>
             </div>
 
-            <div style="margin-top: 10px; text-align: center;">
-                <a href="?reject=1" style="color: #fff; font-size: 0.8rem; text-decoration: none; border-bottom: 1px dashed #666;">
-                    Skip Festival Pass
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="?reject=1" style="font-size: 0.85rem; color: var(--text-muted);">
+                    Skip for now →
                 </a>
             </div>
         </div>

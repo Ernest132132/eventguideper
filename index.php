@@ -38,27 +38,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <title>Welcome | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/style.css?v=50">
-    <style>
-        .split-container { border-top: 1px solid var(--accent-silver); margin-top: 20px; padding-top: 20px; }
-        .lantern-icon { font-size: 2rem; margin-bottom: 10px; }
-    </style>
+    <link rel="stylesheet" href="assets/style.css?v=52">
 </head>
 <body>
 
-    <div class="fabric-container"><div class="fabric-wave"></div><div class="fabric-wave"></div></div>
-    <div class="fog-container"><div class="fog-layer"></div><div class="fog-layer"></div></div>
-
     <div class="container page-visible">
-        <br>
-        <div class="lantern-icon">🏮</div>
-        <h1>Lantern Rite<br><span style="font-size: 0.6em; color: var(--accent-gold);">2025</span></h1>
-        <p style="color: var(--accent-silver);">Welcome, Traveler! Register to join the festivities.</p>
+        <div style="text-align: center; padding: 20px 0;">
+            <div style="font-size: 3rem; margin-bottom: 8px;">🏮</div>
+            <h1 style="margin-bottom: 4px;">Lantern Rite</h1>
+            <p style="font-size: 1.1rem; color: var(--liyue-red); font-weight: 600; margin: 0;">2025</p>
+            <p style="margin-top: 12px;">Welcome, Traveler! Register to join the festivities.</p>
+        </div>
 
         <div class="card">
-            <h2>✦ Liyue Registry ✦</h2>
+            <h2>Liyue Registry</h2>
             <?php if($error): ?>
-                <div class="alert" style="border-color: var(--accent-red); color: #ff6b6b;"><?php echo $error; ?></div>
+                <div class="alert"><?php echo $error; ?></div>
             <?php endif; ?>
 
             <form method="POST">
@@ -66,38 +61,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="hidden" name="user_agent" id="user_agent">
                 <input type="hidden" name="load_time" id="load_time">
 
-                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">TRAVELER NAME</h3>
-
+                <label>Your Name / Alias</label>
                 <input type="text"
                        name="codename"
-                       placeholder="Enter Your Name/Alias"
+                       placeholder="Enter your name..."
                        maxlength="20"
                        autocomplete="off"
                        pattern="[a-zA-Z0-9]+"
                        title="Only letters and numbers are allowed."
                        oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')">
 
-                <button type="submit" name="btn_operative" class="btn-gold" style="width: 100%;">🏮 Join the Festival</button>
+                <button type="submit" name="btn_operative" class="btn-gold" style="margin-top: 8px;">🏮 Join the Festival</button>
 
                 <div class="split-container">
-                    <h3 style="color: #aaa; font-size: 1rem; margin-bottom: 10px;">JUST VISITING</h3>
-                    <p style="font-size: 0.8rem; margin-bottom: 15px;">View schedule and vendor information only.</p>
-                    <button type="submit" name="btn_observer" class="btn-gold" style="width: 100%; background: transparent; border: 1px solid var(--accent-silver); color: var(--accent-silver);">
-                        Enter as Visitor
+                    <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 12px;">
+                        <strong>Just visiting?</strong> Browse the schedule and vendors without registering.
+                    </p>
+                    <button type="submit" name="btn_observer" class="btn-outline" style="width: 100%; padding: 12px; background: transparent; border: 2px solid var(--paper-tan); border-radius: 10px; cursor: pointer; font-weight: 600;">
+                        Continue as Visitor
                     </button>
                 </div>
             </form>
         </div>
 
-        <p style="font-size: 0.8rem; margin-top: 15px;">
-            <a href="recover.php" style="color: var(--accent-gold); text-decoration: none;">
-                <i class="fa-solid fa-key"></i> Lost my pass? Recover Account
+        <div style="text-align: center; padding: 16px 0;">
+            <a href="recover.php" style="font-size: 0.9rem;">
+                <i class="fa-solid fa-key"></i> Lost your pass? Recover it here
             </a>
-        </p>
+        </div>
 
-        <p style="font-size: 0.65rem; color: #666; margin-top: 25px; line-height: 1.4;">
-            By registering, you agree to our<br>
-            <a href="tos.php" style="color: #888; text-decoration: underline;">Terms of Service</a>.
+        <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 20px;">
+            By registering, you agree to our <a href="tos.php">Terms of Service</a>.
         </p>
     </div>
 
