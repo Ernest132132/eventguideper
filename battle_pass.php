@@ -20,7 +20,7 @@ $qrData = "BP-" . $_SESSION['user_id'];
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Battle Pass | Event Guide</title>
+    <title>Battle Pass | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=26">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -36,7 +36,7 @@ $qrData = "BP-" . $_SESSION['user_id'];
     </div>
     <div class="container page-visible">
         <br>
-        <h1 style="color: #E1306C; text-shadow: 0 0 10px #E1306C;">BATTLE PASS</h1>
+        <h1 style="color: #FFD700; text-shadow: 0 0 10px #FFD700;">🌟 GENESIS CRYSTAL PASS 🌟</h1>
         <p style="font-size: 0.9rem; letter-spacing: 2px;">PREMIUM ACCESS GRANTED</p>
 
         <div class="card" style="border-color: #E1306C; box-shadow: 0 0 20px rgba(225, 48, 108, 0.3);">

@@ -38,25 +38,26 @@ if (isset($_SESSION['new_user_rescue'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard | Event Guide</title>
+    <title>Traveler Hub | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=51">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
+
 </head>
 <body>
 
 
     <div class="container page-visible">
-        
+
         <div class="profile-header">
+            <div style="font-size: 1.5rem; margin-bottom: 5px;">🏮</div>
             <h2 style="font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 10px; line-height: 1.4;">
-                EVENT GUIDE TEMPLATE
+                LANTERN RITE 2025
             </h2>
             <hr style="border: 0; border-top: 1px solid rgba(255,215,0,0.3); width: 60%; margin: 10px auto;">
             <p style="font-size: 0.7rem; letter-spacing: 2px; opacity: 0.7;">
-                <?php echo ($role == 'observer') ? 'OBSERVER' : 'REGISTERED GUEST'; ?>
+                <?php echo ($role == 'observer') ? 'VISITOR' : 'TRAVELER'; ?>
             </p>
             <h1><?php echo htmlspecialchars($codename); ?></h1>
         </div>
@@ -79,7 +80,7 @@ if (isset($_SESSION['new_user_rescue'])) {
             
             <?php if ($role == 'operative'): ?>
                 <a href="id_card.php" class="app-btn">
-                    <i class="fa-solid fa-id-card"></i><span>My ID</span>
+                    <i class="fa-solid fa-id-card"></i><span>Festival Pass</span>
                 </a>
             <?php endif; ?>
 
@@ -104,26 +105,26 @@ if (isset($_SESSION['new_user_rescue'])) {
             <a href="confidants.php" class="app-btn"><i class="fa-solid fa-masks-theater"></i><span>Performers</span></a>
 
             <a href="intel.php" class="app-btn"><i class="fa-solid fa-map-location-dot"></i><span>Vendors</span></a>
-            
+
             <a href="sos.php" class="app-btn"><i class="fa-solid fa-circle-question"></i><span>FAQ</span></a>
 
             <!-- Add your social media link here -->
-            <!-- <a href="https://www.instagram.com/your_handle/" target="_blank" class="app-btn"><i class="fa-brands fa-instagram"></i><span>Our Group</span></a> -->
+            <!-- <a href="https://www.instagram.com/your_handle/" target="_blank" class="app-btn"><i class="fa-brands fa-instagram"></i><span>Adventurer's Guild</span></a> -->
 
             <?php if ($role == 'observer'): ?>
-                <a href="upgrade_access.php" class="app-btn" style="grid-column: span 2; border-color: var(--velvet-green); color: var(--velvet-green); background: rgba(0, 210, 106, 0.1);">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i><span>Join Experience</span>
+                <a href="upgrade_access.php" class="app-btn" style="grid-column: span 2; border-color: var(--accent-green); color: var(--accent-green); background: rgba(76, 175, 80, 0.1);">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i><span>Become a Traveler</span>
                 </a>
             <?php endif; ?>
 
             <?php if ($role == 'operative'): ?>
                 <?php if ($bp_owned): ?>
                     <a href="id_card.php" class="app-btn" style="grid-column: span 2; border-color: #FFD700; color: #FFD700; background: rgba(212, 175, 55, 0.15);">
-                        <i class="fa-solid fa-crown"></i><span>BATTLE PASS (OWNED)</span>
+                        <i class="fa-solid fa-crown"></i><span>🌟 GENESIS CRYSTAL PASS</span>
                     </a>
                 <?php else: ?>
-                    <a href="id_card.php?action=upgrade" class="app-btn" style="grid-column: span 2; border-color: #E1306C; background: rgba(225, 48, 108, 0.15); color: #E1306C;">
-                        <i class="fa-solid fa-cart-plus"></i> <span>GET UPGRADE</span>
+                    <a href="id_card.php?action=upgrade" class="app-btn" style="grid-column: span 2; border-color: var(--lantern-orange); background: rgba(255, 140, 66, 0.15); color: var(--lantern-orange);">
+                        <i class="fa-solid fa-gem"></i> <span>GET PREMIUM PASS</span>
                     </a>
                 <?php endif; ?>
             <?php endif; ?>
@@ -132,7 +133,7 @@ if (isset($_SESSION['new_user_rescue'])) {
         </div>
 
         <br><br>
-        <p style="font-size: 0.7rem; opacity: 0.5; margin-bottom: 5px;">SECURE CONNECTION</p>
+        <p style="font-size: 0.7rem; opacity: 0.5; margin-bottom: 5px;">✦ Liyue Harbor ✦</p>
         <a href="tos.php" style="font-size: 0.6rem; color: #444; text-decoration: none;">[ TERMS OF SERVICE ]</a>
     </div>
 
@@ -163,7 +164,7 @@ if (isset($_SESSION['new_user_rescue'])) {
                     }).then(canvas => {
                         // Trigger download
                         const link = document.createElement('a');
-                        link.download = 'Event-Recovery-Code.png';
+                        link.download = 'LanternRite-Recovery-Code.png';
                         link.href = canvas.toDataURL("image/png");
                         link.click();
 

@@ -7,38 +7,60 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// TEMPLATE DATA: PERFORMERS
-// Customize this array with your event's performers
-// Organize by category (e.g., by role, time slot, location, etc.)
+// LANTERN RITE PERFORMERS DATA
+// Organize cosplayers by Genshin region
 $performers = [
-    'CATEGORY 1' => [
+    'LIYUE' => [
         [
             'name' => 'Performer Name',
-            'character' => 'Character/Role Name',
+            'character' => 'Xiao',
             'handle' => 'instagram_handle',
-            'desc' => 'Description of the performer or character they portray.',
-            'image' => 'placeholder.jpg' // Place images in assets/images/
-        ],
-        // Add more performers in this category...
-    ],
-    'CATEGORY 2' => [
-        [
-            'name' => 'Another Performer',
-            'character' => 'Another Character',
-            'handle' => 'another_handle',
-            'desc' => 'Another description here.',
+            'desc' => 'The Vigilant Yaksha, guardian of Liyue.',
             'image' => 'placeholder.jpg'
         ],
-        // Add more performers...
+        [
+            'name' => 'Performer Name',
+            'character' => 'Hu Tao',
+            'handle' => 'instagram_handle',
+            'desc' => '77th Director of the Wangsheng Funeral Parlor.',
+            'image' => 'placeholder.jpg'
+        ],
+        [
+            'name' => 'Performer Name',
+            'character' => 'Zhongli',
+            'handle' => 'instagram_handle',
+            'desc' => 'A consultant for the Wangsheng Funeral Parlor.',
+            'image' => 'placeholder.jpg'
+        ],
+        // Add more Liyue performers...
     ],
-    // Add more categories as needed...
+    'MONDSTADT' => [
+        [
+            'name' => 'Performer Name',
+            'character' => 'Amber',
+            'handle' => 'instagram_handle',
+            'desc' => 'Outrider of the Knights of Favonius.',
+            'image' => 'placeholder.jpg'
+        ],
+        // Add more Mondstadt performers...
+    ],
+    'OTHER REGIONS' => [
+        [
+            'name' => 'Performer Name',
+            'character' => 'Wanderer',
+            'handle' => 'instagram_handle',
+            'desc' => 'A wandering eccentric.',
+            'image' => 'placeholder.jpg'
+        ],
+        // Add more performers from other regions...
+    ],
 ];
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Performers | Event Guide</title>
+    <title>Performers | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=24">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

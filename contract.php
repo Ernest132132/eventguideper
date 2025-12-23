@@ -15,17 +15,17 @@ $error = "";
 // 2. HANDLE SIGNING (POST REQUEST)
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $code = trim($_POST['passcode']);
-    
-    // Validate Code - Change this to your event's keyword
-    if (strtoupper($code) === "AGREE") {
+
+    // Validate Code - Lantern Rite keyword
+    if (strtoupper($code) === "MINGXIAO") {
         // STATE CHANGE: PENDING -> ACTIVE
         $pdo->prepare("UPDATE operatives SET status = 'active' WHERE id = ?")->execute([$_SESSION['user_id']]);
         $_SESSION['status'] = 'active';
-        
-        // TRIGGER TRANSITION (Allows us to bypass the redirect for this one load)
+
+        // TRIGGER TRANSITION
         $transition_active = true;
     } else {
-        $error = "Invalid code. Please check with event staff.";
+        $error = "Invalid code. Please check with the Millelith or event staff.";
     }
 }
 
@@ -37,10 +37,7 @@ if (isset($_GET['reject'])) {
     exit();
 }
 
-// 4. THE GATEKEEPER (Strict Logic Fix)
-// We redirect to Home ONLY if:
-// A) We are NOT currently showing the 'Just Signed' animation ($transition_active is false)
-// B) AND the user is already marked 'active' in the database/session.
+// 4. THE GATEKEEPER
 if (!$transition_active && $user['status'] !== 'pending') {
     header("Location: home.php");
     exit();
@@ -53,11 +50,11 @@ $qrData = "OP-" . $_SESSION['user_id'];
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sign Agreement | Event Guide</title>
+    <title>Festival Agreement | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/style.css?v=39"> 
+    <link rel="stylesheet" href="assets/style.css?v=50">
     <style>
-        /* --- CONTRACT STYLES --- */
+        /* --- FESTIVAL CONTRACT STYLES --- */
         .contract-rules {
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--accent-gold);
@@ -67,7 +64,7 @@ $qrData = "OP-" . $_SESSION['user_id'];
             position: relative;
         }
         .contract-rules::before {
-            content: "STIPULATIONS";
+            content: "✦ FESTIVAL GUIDELINES ✦";
             position: absolute;
             top: -10px;
             left: 50%;
@@ -76,15 +73,16 @@ $qrData = "OP-" . $_SESSION['user_id'];
             padding: 0 10px;
             color: var(--accent-gold);
             font-family: 'Cinzel', serif;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 2px;
+            white-space: nowrap;
         }
         .rule-row {
             margin-bottom: 10px;
             display: flex;
             align-items: flex-start;
             font-size: 0.9rem;
-            color: #ddd;
+            color: var(--accent-silver);
             line-height: 1.4;
         }
         .rule-num {
@@ -105,64 +103,66 @@ $qrData = "OP-" . $_SESSION['user_id'];
             letter-spacing: 1px;
         }
 
-        /* --- MYSTICAL TRANSITION STYLES --- */
+        /* --- LANTERN TRANSITION STYLES --- */
         .transition-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1a2140 0%, #000 100%);
+            background: radial-gradient(circle at center, #2B1111 0%, #0D0505 100%);
             z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             opacity: 0;
-            animation: fadeInDeep 0.5s forwards; /* Quick fade to blue */
+            animation: fadeInDeep 0.5s forwards;
         }
-        
-        /* The main "Seal" Text */
+
         .seal-text {
             font-family: 'Cinzel', serif;
             font-size: 2rem;
             color: var(--accent-gold-light);
             letter-spacing: 6px;
             text-transform: uppercase;
-
-            /* Initial State */
             opacity: 0;
             filter: blur(10px);
             transform: scale(0.9);
-
-            /* Animation: 2 seconds long */
             animation: manifestText 2s ease-out forwards 0.3s;
-            text-shadow: 0 0 20px var(--accent-gold), 0 0 40px var(--accent-dark-blue);
+            text-shadow: 0 0 20px var(--accent-gold), 0 0 40px var(--lantern-crimson);
         }
 
-        /* The Subtitle "Welcome" */
         .sub-text {
             font-family: 'Lato', sans-serif;
-            color: #ccc;
+            color: var(--accent-silver);
             font-size: 0.9rem;
             letter-spacing: 3px;
             text-transform: uppercase;
             margin-top: 15px;
             opacity: 0;
-            /* Animation: 2.5s long, starts at 1s */
             animation: subTextCycle 2.5s ease-in-out forwards 1s;
+        }
+
+        .lantern-float {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: lanternBob 2s ease-in-out infinite;
+        }
+
+        @keyframes lanternBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         @keyframes fadeInDeep {
             to { opacity: 1; }
         }
 
-        /* Seal Text: Blur In -> Hold -> Blur Out */
         @keyframes manifestText {
             0% { opacity: 0; filter: blur(15px); transform: scale(0.95); }
             40% { opacity: 1; filter: blur(0px); transform: scale(1); }
             80% { opacity: 1; filter: blur(0px); transform: scale(1); }
-            100% { opacity: 0; filter: blur(5px); transform: scale(1.05); } 
+            100% { opacity: 0; filter: blur(5px); transform: scale(1.05); }
         }
 
-        /* Sub Text: Float Up -> Hold -> Fade Out */
         @keyframes subTextCycle {
             0% { opacity: 0; transform: translateY(10px); }
             20% { opacity: 0.8; transform: translateY(0); }
@@ -172,7 +172,7 @@ $qrData = "OP-" . $_SESSION['user_id'];
     </style>
 </head>
 <body>
-    
+
     <?php if ($transition_active): ?>
         <div class="transition-overlay">
             <div class="fog-container" style="z-index: -1;">
@@ -180,12 +180,12 @@ $qrData = "OP-" . $_SESSION['user_id'];
                 <div class="fog-layer"></div>
             </div>
 
-            <div class="seal-text">Agreement Confirmed</div>
-            <div class="sub-text">Welcome to the Event</div>
+            <div class="lantern-float">🏮</div>
+            <div class="seal-text">May Your Wishes Come True</div>
+            <div class="sub-text">Welcome to Lantern Rite</div>
         </div>
-        
+
         <script>
-            // 5000ms = 5 seconds total.
             setTimeout(function() {
                 window.location.href = 'home.php';
             }, 4500);
@@ -195,57 +195,58 @@ $qrData = "OP-" . $_SESSION['user_id'];
         <div class="fabric-container"><div class="fabric-wave"></div><div class="fabric-wave"></div></div>
         <div class="container page-visible">
             <br>
-            <h1 style="color: var(--accent-gold); text-shadow: 0 0 10px var(--accent-gold);">EVENT AGREEMENT</h1>
-            
-            <div class="card" style="border-color: var(--accent-gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);">
-                
+            <div style="font-size: 2rem; margin-bottom: 10px;">🏮</div>
+            <h1 style="color: var(--accent-gold); text-shadow: 0 0 10px var(--accent-gold);">FESTIVAL AGREEMENT</h1>
+
+            <div class="card" style="border-color: var(--accent-gold); box-shadow: 0 0 20px rgba(212, 160, 23, 0.3);">
+
                 <div class="contract-rules">
                     <div class="rule-row">
                         <span class="rule-num">I.</span>
-                        <span>Be respectful to all performers and staff at the event.</span>
+                        <span>Treat all performers, vendors, and fellow Travelers with respect.</span>
                     </div>
                     <div class="rule-row">
                         <span class="rule-num">II.</span>
-                        <span>This experience is shared; please be mindful of other guests.</span>
+                        <span>The spirit of Lantern Rite is one of unity; please be mindful of other guests.</span>
                     </div>
                     <div class="rule-row">
                         <span class="rule-num">III.</span>
-                        <span>Follow all posted event rules and staff instructions.</span>
+                        <span>Follow all posted event rules and Millelith (staff) instructions.</span>
                     </div>
                     <div class="rule-row">
                         <span class="rule-num">IV.</span>
-                        <span>If you need assistance, please find staff at the Info Booth.</span>
+                        <span>For assistance, seek the Adventurer's Guild booth or any staff member.</span>
                     </div>
                 </div>
 
                 <p style="font-family: 'Cinzel', serif; font-size: 1rem; line-height: 1.6; color: var(--accent-gold-light); margin-bottom: 25px; font-style: italic;">
-                    By agreeing to participate, you acknowledge that you have read and will follow all event guidelines.
+                    "May the flames of wisdom spread to all, and never be extinguished."
                 </p>
-                
+
                 <?php if($error): ?>
-                    <div class="alert" style="border-color: red; color: red;"><?php echo $error; ?></div>
+                    <div class="alert" style="border-color: var(--accent-red); color: #ff6b6b;"><?php echo $error; ?></div>
                 <?php endif; ?>
 
                 <form method="POST">
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <label style="color: #aaa; font-size: 0.7rem; letter-spacing: 2px; text-align: center;">PARTICIPANT</label>
+                        <label style="color: #aaa; font-size: 0.7rem; letter-spacing: 2px; text-align: center;">TRAVELER NAME</label>
                         <div class="signature-line">
                             <?php echo htmlspecialchars($codename); ?>
                         </div>
                     </div>
 
-                    <label style="color: var(--accent-gold);">EVENT KEYWORD</label>
-                    <input type="text" name="passcode" placeholder="Enter code..." required autocomplete="off" style="border-color: var(--accent-gold); color: var(--accent-gold);">
+                    <label style="color: var(--accent-gold);">FESTIVAL KEYWORD</label>
+                    <input type="text" name="passcode" placeholder="Enter the keyword..." required autocomplete="off" style="border-color: var(--accent-gold); color: var(--accent-gold);">
 
                     <button type="submit" class="btn-gold" style="background: var(--accent-gold); color: #000; margin-top: 15px; width: 100%; border: 1px solid white;">
-                        CONFIRM AGREEMENT
+                        🏮 LIGHT MY LANTERN
                     </button>
                 </form>
             </div>
 
             <div style="text-align: center; margin-top: 40px; margin-bottom: 20px; opacity: 0.8;">
                 <div class="qr-frame" style="border: 2px solid var(--accent-gold); padding: 5px; background: white; display: inline-block;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<?php echo $qrData; ?>" alt="ID QR">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<?php echo $qrData; ?>" alt="Festival Pass QR">
                 </div>
                 <p style="font-size: 0.75rem; color: var(--accent-gold); margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">
                     Show to Staff for Check-In / Upgrades
@@ -254,7 +255,7 @@ $qrData = "OP-" . $_SESSION['user_id'];
 
             <div style="margin-top: 10px; text-align: center;">
                 <a href="?reject=1" style="color: #fff; font-size: 0.8rem; text-decoration: none; border-bottom: 1px dashed #666;">
-                    Reject Contract
+                    Skip Festival Pass
                 </a>
             </div>
         </div>

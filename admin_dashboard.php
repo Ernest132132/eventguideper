@@ -183,7 +183,7 @@ if (isset($_GET['view_user'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard | Event Guide</title>
+    <title>Admin Dashboard | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=50">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

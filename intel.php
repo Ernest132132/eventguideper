@@ -7,20 +7,34 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// TEMPLATE DATA: VENDORS
-// Customize this array with your event's vendors
+// LANTERN RITE VENDOR DATA
+// Customize with your event's vendors
 $all_vendors = [
     [
-        'name' => 'Vendor Name',
+        'name' => 'Wanmin Restaurant',
         'instagram_handle' => 'vendor_handle',
-        'description' => 'Description of what this vendor sells or offers.',
-        'icon_image' => 'placeholder.jpg', // Place images in assets/images/
+        'description' => 'Delicious Liyue cuisine! Try our famous Jueyun Chili Chicken.',
+        'icon_image' => 'placeholder.jpg',
         'booth_image' => null
     ],
     [
-        'name' => 'Another Vendor',
+        'name' => 'Granny Shan\'s Toys',
         'instagram_handle' => 'another_vendor',
-        'description' => 'Another vendor description.',
+        'description' => 'Traditional Xiao Lanterns and festival toys.',
+        'icon_image' => 'placeholder.jpg',
+        'booth_image' => null
+    ],
+    [
+        'name' => 'Xigu Antiques',
+        'instagram_handle' => 'vendor_handle',
+        'description' => 'Fine antiques, Rex Lapis figurines, and Liyue memorabilia.',
+        'icon_image' => 'placeholder.jpg',
+        'booth_image' => null
+    ],
+    [
+        'name' => 'Bubu Pharmacy',
+        'instagram_handle' => 'vendor_handle',
+        'description' => 'Traditional medicine and health items.',
         'icon_image' => 'placeholder.jpg',
         'booth_image' => null
     ],
@@ -36,7 +50,7 @@ usort($all_vendors, function($a, $b) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vendors | Event Guide</title>
+    <title>Vendors | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=12">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

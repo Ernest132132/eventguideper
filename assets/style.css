@@ -1,27 +1,33 @@
 /*
 |--------------------------------------------------------------------------
-| EVENT GUIDE TEMPLATE - Style Sheet
+| LANTERN RITE EVENT GUIDE - Style Sheet
 |--------------------------------------------------------------------------
-| A reusable template for event guide applications.
-| Customize the color variables below to match your event's branding.
+| Genshin Impact Lantern Rite Theme
+| Warm reds, golds, and festive lantern aesthetics
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&family=Noto+Serif+SC:wght@400;700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
-/* --- 1. CORE VARIABLES (Customize these for your event) --- */
+/* --- 1. CORE VARIABLES (Lantern Rite Theme) --- */
 :root {
-    /* Primary Colors - Change these to match your event branding */
-    --accent-dark-blue: #02020a;
-    --accent-medium-blue: #0e1638;
-    --accent-blue: #1b2845;
-    --accent-gold: #d4af37;
-    --accent-gold-light: #fceabb;
-    --accent-red: #d90018;
-    --accent-silver: #c0c0c0;
-    --accent-green: #00d26a;
-    --accent-light-text: #e0e0e0;
-    --accent-dark-text: #050610;
+    /* Primary Colors - Lantern Rite Palette */
+    --accent-dark-blue: #1A0A0A;      /* Deep maroon-black */
+    --accent-medium-blue: #2B1111;     /* Dark burgundy */
+    --accent-blue: #3D1C1C;            /* Warm brown-red */
+    --accent-gold: #D4A017;            /* Lantern gold */
+    --accent-gold-light: #F5C16B;      /* Bright lantern glow */
+    --accent-red: #C8102E;             /* Festive red */
+    --accent-silver: #E8D5B7;          /* Warm cream */
+    --accent-green: #4CAF50;           /* Success green */
+    --accent-light-text: #FFF8E7;      /* Warm ivory */
+    --accent-dark-text: #1A0808;       /* Near black */
+
+    /* Lantern Rite Special Colors */
+    --lantern-orange: #FF8C42;
+    --lantern-crimson: #8B0000;
+    --lantern-cream: #FDF5E6;
+    --liyue-brown: #8B4513;
 
     /* Legacy aliases (for backwards compatibility) */
     --velvet-dark-blue: var(--accent-dark-blue);
@@ -52,28 +58,28 @@ body {
     perspective: 1200px; /* Vital for Card Flip */
 }
 
-/* A. FABRIC OF REALITY (Background Layers) */
+/* A. LANTERN GLOW (Background Layers) */
 .fabric-container {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
     z-index: -2;
     overflow: hidden;
-    /* Deep Velvet Gradient */
-    background: radial-gradient(circle at center, #0e1638 0%, #020205 90%);
+    /* Deep Liyue Night Gradient */
+    background: radial-gradient(circle at center, #2B1111 0%, #0D0505 90%);
 }
 
 .fabric-wave {
     position: absolute;
     width: 200%; height: 200%;
     top: -50%; left: -50%;
-    /* Subtle silk-like movement */
-    background: radial-gradient(ellipse at center, rgba(30, 60, 150, 0.15) 0%, rgba(0,0,0,0) 60%);
+    /* Warm lantern glow effect */
+    background: radial-gradient(ellipse at center, rgba(212, 160, 23, 0.08) 0%, rgba(0,0,0,0) 60%);
     animation: fabric-flow 20s infinite linear;
     transform-origin: 50% 50%;
 }
 .fabric-wave:nth-child(2) {
     animation-duration: 35s;
-    background: radial-gradient(ellipse at center, rgba(20, 40, 100, 0.1) 0%, rgba(0,0,0,0) 50%);
+    background: radial-gradient(ellipse at center, rgba(200, 16, 46, 0.06) 0%, rgba(0,0,0,0) 50%);
     animation-direction: reverse;
 }
 
@@ -83,7 +89,7 @@ body {
     100% { transform: rotate(360deg) scale(1); }
 }
 
-/* B. COGNITIVE FOG (Bottom Ambience) */
+/* B. LANTERN MIST (Bottom Ambience) */
 .fog-container {
     position: fixed;
     bottom: 0; left: 0; width: 100%; height: 30vh;
@@ -93,12 +99,12 @@ body {
 .fog-layer {
     position: absolute;
     bottom: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(to top, rgba(10, 15, 40, 0.9), transparent);
+    background: linear-gradient(to top, rgba(26, 10, 10, 0.95), transparent);
     animation: fog-drift 10s infinite ease-in-out alternate;
 }
 .fog-layer:nth-child(2) {
     height: 50%;
-    background: linear-gradient(to top, rgba(5, 8, 20, 1), transparent);
+    background: linear-gradient(to top, rgba(13, 5, 5, 1), transparent);
     animation-duration: 15s;
     animation-direction: alternate-reverse;
 }

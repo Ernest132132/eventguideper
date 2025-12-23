@@ -20,21 +20,21 @@ $qrData = "OP-" . $operative['id'];
 // 3. VISUAL LOGIC
 $pulseClass = ""; 
 $statusColor = "var(--accent-gold)";
-$statusText = "CONTRACT PENDING";
+$statusText = "PASS PENDING";
 $specialCardClass = ""; 
 $instruction = "Show this to staff for upgrades/activity check-in.";
 
 // Battle Pass Visual Override
 if ($operative['bp_owned'] == 1) {
     $statusColor = "#FFD700"; // GOLD
-    $statusText = "VIP / BATTLE PASS";
+    $statusText = "GENESIS CRYSTAL PASS";
     $specialCardClass = "card-battle-pass"; // Trigger the fancy CSS
     $instruction = "Scan at Info Booth to claim upgraded rewards.";
     
     if ($operative['bp_redeemed'] == 1) {
         $statusText = "REWARDS CLAIMED";
         $statusColor = "#aaa";
-        $instruction = "Battle Pass fully redeemed.";
+        $instruction = "Genesis Crystal Pass fully redeemed.";
     }
 } else {
     // Standard ID visual logic
@@ -57,7 +57,7 @@ if ($operative['bp_owned'] == 1) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My ID Card</title>
+    <title>Festival Pass | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/style.css?v=36">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

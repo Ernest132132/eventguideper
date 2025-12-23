@@ -36,25 +36,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Registration | Event Guide</title>
+    <title>Welcome | Lantern Rite 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/style.css?v=34"> 
-    <style> .split-container { border-top: 1px solid var(--velvet-silver); margin-top: 20px; padding-top: 20px; } </style>
+    <link rel="stylesheet" href="assets/style.css?v=50">
+    <style>
+        .split-container { border-top: 1px solid var(--accent-silver); margin-top: 20px; padding-top: 20px; }
+        .lantern-icon { font-size: 2rem; margin-bottom: 10px; }
+    </style>
 </head>
 <body>
-    
+
     <div class="fabric-container"><div class="fabric-wave"></div><div class="fabric-wave"></div></div>
     <div class="fog-container"><div class="fog-layer"></div><div class="fog-layer"></div></div>
 
     <div class="container page-visible">
-        <br><br>
-        <h1>Welcome to the<br>Event Guide</h1>
-        <p>Register to get started.</p>
-        
+        <br>
+        <div class="lantern-icon">🏮</div>
+        <h1>Lantern Rite<br><span style="font-size: 0.6em; color: var(--accent-gold);">2025</span></h1>
+        <p style="color: var(--accent-silver);">Welcome, Traveler! Register to join the festivities.</p>
+
         <div class="card">
-            <h2>The Registry</h2>
+            <h2>✦ Liyue Registry ✦</h2>
             <?php if($error): ?>
-                <div class="alert" style="border-color: red; color: red;"><?php echo $error; ?></div>
+                <div class="alert" style="border-color: var(--accent-red); color: #ff6b6b;"><?php echo $error; ?></div>
             <?php endif; ?>
 
             <form method="POST">
@@ -62,8 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="hidden" name="user_agent" id="user_agent">
                 <input type="hidden" name="load_time" id="load_time">
 
-                <h3 style="color: var(--velvet-gold); font-size: 1rem; margin-bottom: 10px;">PARTICIPATING GUEST</h3>
-                
+                <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 10px;">TRAVELER NAME</h3>
+
                 <input type="text"
                        name="codename"
                        placeholder="Enter Your Name/Alias"
@@ -72,22 +76,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                        pattern="[a-zA-Z0-9]+"
                        title="Only letters and numbers are allowed."
                        oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')">
-                       
-                <button type="submit" name="btn_operative" class="btn-gold" style="width: 100%;">Create ID & Sign Contract</button>
+
+                <button type="submit" name="btn_operative" class="btn-gold" style="width: 100%;">🏮 Join the Festival</button>
 
                 <div class="split-container">
-                    <h3 style="color: #aaa; font-size: 1rem; margin-bottom: 10px;">JUST LOOKING</h3>
-                    <p style="font-size: 0.8rem; margin-bottom: 15px;">Access maps and schedules only.</p>
-                    <button type="submit" name="btn_observer" class="btn-gold" style="width: 100%; background: transparent; border: 1px solid var(--velvet-silver); color: var(--velvet-silver);">
-                        Enter as Observer
+                    <h3 style="color: #aaa; font-size: 1rem; margin-bottom: 10px;">JUST VISITING</h3>
+                    <p style="font-size: 0.8rem; margin-bottom: 15px;">View schedule and vendor information only.</p>
+                    <button type="submit" name="btn_observer" class="btn-gold" style="width: 100%; background: transparent; border: 1px solid var(--accent-silver); color: var(--accent-silver);">
+                        Enter as Visitor
                     </button>
                 </div>
             </form>
         </div>
-        
+
         <p style="font-size: 0.8rem; margin-top: 15px;">
-            <a href="recover.php" style="color: var(--velvet-gold); text-decoration: none;">
-                <i class="fa-solid fa-key"></i> Lost my ID? Recover Account
+            <a href="recover.php" style="color: var(--accent-gold); text-decoration: none;">
+                <i class="fa-solid fa-key"></i> Lost my pass? Recover Account
             </a>
         </p>
 
